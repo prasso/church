@@ -1,6 +1,10 @@
 # Church Management Requirements
 
-This document outlines the comprehensive feature set and benefits that churches typically expect in their management software. It serves as a product requirements overview for the Prasso Church Management package.
+This document outlines the comprehensive feature set and benefits that churches typically expect in their management software. It serves as a product requirements overview for the Prasso Church Management package, which is part of the broader Prasso ecosystem.
+
+The Prasso Church Management system is designed as a modular solution that integrates with other Prasso packages to provide complete functionality. This package focuses on core backend operations and data management, while complementary packages handle user interfaces, payment processing, and communications.
+
+For details on package responsibilities and ecosystem architecture, see the [Prasso Ecosystem Architecture](#prasso-ecosystem-architecture) section below.
 
 ## Core Member Management
 
@@ -23,15 +27,19 @@ This document outlines the comprehensive feature set and benefits that churches 
 - Multi-Channel Messaging
   - Email, SMS, phone, in‑app messaging
   - Templates for welcome messages, event reminders, pastoral follow-ups
+  - **Note: Transport and basic data management provided by Prasso_Messaging package**
 - Automated Communications
   - Birthday/anniversary reminders
   - Visitor follow-up sequences
   - Missed service outreach
+  - **Note: Templates for church-specific communications provided by Prasso_Messaging package**
 - Newsletter & Bulletin Management
   - Create and distribute digital/print communications
   - Event calendars, announcements, spiritual content
+  - **Note: This feature is provided by Prasso_API**
 - Mobile App Integration
   - Native or web access for members to update info, access directories, receive notifications
+  - **Note: This feature is provided by Prasso_API**
 
 ## Financial Management
 
@@ -41,6 +49,7 @@ This document outlines the comprehensive feature set and benefits that churches 
 - Online Giving Platform
   - Secure one-time and recurring donations
   - Multiple payment methods
+  - **Note: This feature is provided by Prasso_API**
 - Pledge Management
   - Track commitments (building funds, missions, annual campaigns)
   - Progress monitoring
@@ -113,6 +122,7 @@ This document outlines the comprehensive feature set and benefits that churches 
 
 - Website Integration
   - Online giving, event registration, member portal
+  - **Note: This feature is provided by Prasso_API**
 - Accounting Software Sync
   - QuickBooks, Xero, or similar platforms
 - Email Platform Integration
@@ -150,8 +160,39 @@ This document outlines the comprehensive feature set and benefits that churches 
 - Cost Efficiency
   - Consolidated platform reduces subscriptions and manual processes
 
+## Prasso Ecosystem Architecture
+
+The Prasso Church Management system is designed as part of a modular ecosystem that leverages multiple specialized packages to deliver comprehensive functionality:
+
+### Prasso_Church Package (This Package)
+- **Core Data Management**: Member profiles, family relationships, visitor tracking, attendance records
+- **Event Management**: Service planning, event scheduling, attendance tracking
+- **Ministry Operations**: Group management, volunteer coordination, pastoral care workflows
+- **Reporting & Analytics**: Member engagement reports, growth analytics, financial dashboards
+- **Backend API**: RESTful endpoints for all core operations, event-driven architecture
+
+### Prasso_API Package
+- **Online Giving Platform**: Secure payment processing, recurring donations, multiple payment methods
+- **Newsletter & Bulletin Management**: Content creation, distribution, digital/print communications
+- **Mobile App Integration**: Native and web mobile access, push notifications
+- **Website Integration**: Public APIs for member portals, event registration
+- **Frontend Components**: User interface components and JavaScript functionality
+
+### Prasso_Messaging Package
+- **Multi-Channel Communication**: Email, SMS, phone, and in-app messaging transport
+- **Message Templates**: Church-specific templates for welcome messages, event reminders, pastoral follow-ups
+- **Automated Communications**: Birthday/anniversary reminders, visitor follow-up sequences, missed service outreach
+- **Communication Workflows**: Automated messaging sequences and triggers
+
+### Laravel Framework (Base)
+- **Authentication & Authorization**: User management, role-based access control
+- **Database Management**: Migrations, models, relationships, and query builders
+- **API Infrastructure**: Routing, middleware, request validation
+- **Security Features**: CSRF protection, encryption, secure headers
+- **Testing Framework**: Unit and feature testing capabilities
+
 ---
 
-This requirements overview complements module-specific documentation:
-- Events: `docs/EVENTS.md`
-- Pastoral Care: `docs/PASTORAL_CARE.md`
+This modular approach allows churches to deploy a complete church management solution by combining these packages. The Prasso_Church package provides the core business logic and data management, while Prasso_API handles user-facing features and Prasso_Messaging manages communications.
+
+The package is production-ready for churches that use the Prasso ecosystem and provides an excellent foundation for building complete church management solutions. The modular design allows for seamless integration with Prasso_API and Prasso_Messaging to deliver a complete feature set.
