@@ -48,6 +48,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_event_occurrences');
+        Schema::dropIfExists('chm_event_occurrences');
     }
 };

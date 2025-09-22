@@ -17,7 +17,7 @@ class Report extends Model
      *
      * @var string
      */
-    protected $table = 'aph_reports';
+    protected $table = 'chm_reports';
 
     /**
      * The attributes that are mass assignable.

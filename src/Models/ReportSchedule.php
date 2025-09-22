@@ -13,7 +13,7 @@ class ReportSchedule extends Model
      *
      * @var string
      */
-    protected $table = 'aph_report_schedules';
+    protected $table = 'chm_report_schedules';
 
     /**
      * The attributes that are mass assignable.

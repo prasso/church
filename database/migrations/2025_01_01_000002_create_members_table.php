@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aph_members', function (Blueprint $table) {
+        Schema::create('chm_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('family_id')->nullable()->constrained('aph_families');
+            $table->foreignId('family_id')->nullable()->constrained('chm_families');
             $table->foreignId('user_id')->nullable()->constrained('users');
             
             // Personal Information
@@ -61,6 +61,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_members');
+        Schema::dropIfExists('chm_members');
     }
 };

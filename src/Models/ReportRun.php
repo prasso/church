@@ -12,7 +12,7 @@ class ReportRun extends Model
      *
      * @var string
      */
-    protected $table = 'aph_report_runs';
+    protected $table = 'chm_report_runs';
 
     /**
      * The attributes that are mass assignable.

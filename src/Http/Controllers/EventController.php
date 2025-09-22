@@ -109,7 +109,7 @@ class EventController extends Controller
             'capacity' => 'nullable|integer|min:1',
             'requires_registration' => 'boolean',
             'registration_deadline' => 'nullable|date',
-            'ministry_id' => 'nullable|exists:aph_ministries,id',
+            'ministry_id' => 'nullable|exists:chm_ministries,id',
             'metadata' => 'nullable|array',
         ]);
 
@@ -187,7 +187,7 @@ class EventController extends Controller
             'capacity' => 'nullable|integer|min:1',
             'requires_registration' => 'boolean',
             'registration_deadline' => 'nullable|date',
-            'ministry_id' => 'nullable|exists:aph_ministries,id',
+            'ministry_id' => 'nullable|exists:chm_ministries,id',
             'metadata' => 'nullable|array',
             'update_future_occurrences' => 'boolean', // Whether to update future occurrences
         ]);
@@ -346,8 +346,8 @@ class EventController extends Controller
     public function recordAttendance(EventOccurrence $occurrence, Request $request)
     {
         $request->validate([
-            'member_id' => 'required_without:guest_name|exists:aph_members,id',
-            'family_id' => 'nullable|exists:aph_families,id',
+            'member_id' => 'required_without:guest_name|exists:chm_members,id',
+            'family_id' => 'nullable|exists:chm_families,id',
             'guest_name' => 'required_without:member_id|string|max:255',
             'guest_email' => 'nullable|email|max:255',
             'guest_phone' => 'nullable|string|max:20',
@@ -412,7 +412,7 @@ class EventController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'event_type' => 'nullable|string|in:service,meeting,event',
-            'ministry_id' => 'nullable|exists:aph_ministries,id',
+            'ministry_id' => 'nullable|exists:chm_ministries,id',
         ]);
 
         $startDate = $request->start_date;
@@ -540,11 +540,11 @@ class EventController extends Controller
     public function checkIn(EventOccurrence $occurrence, Request $request)
     {
         $request->validate([
-            'member_id' => 'required_without:guest_name|exists:aph_members,id',
+            'member_id' => 'required_without:guest_name|exists:chm_members,id',
             'guest_name' => 'required_without:member_id|string|max:255',
             'guest_email' => 'nullable|email|max:255',
             'guest_phone' => 'nullable|string|max:20',
-            'family_id' => 'nullable|exists:aph_families,id',
+            'family_id' => 'nullable|exists:chm_families,id',
         ]);
 
         // Check if the event occurrence is in the future
@@ -618,7 +618,7 @@ class EventController extends Controller
     public function checkOut(EventOccurrence $occurrence, Request $request)
     {
         $request->validate([
-            'member_id' => 'required|exists:aph_members,id',
+            'member_id' => 'required|exists:chm_members,id',
         ]);
 
         $attendance = $occurrence->attendances()

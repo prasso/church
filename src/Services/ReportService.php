@@ -21,22 +21,22 @@ class ReportService
     public function getAttendanceStats(Carbon $startDate, Carbon $endDate, array $filters = [])
     {
         $query = AttendanceRecord::query()
-            ->join('aph_attendance_events', 'aph_attendance_records.event_id', '=', 'aph_attendance_events.id')
-            ->whereBetween('aph_attendance_events.start_time', [$startDate, $endDate])
+            ->join('chm_attendance_events', 'chm_attendance_records.event_id', '=', 'chm_attendance_events.id')
+            ->whereBetween('chm_attendance_events.start_time', [$startDate, $endDate])
             ->select([
-                DB::raw('COUNT(DISTINCT aph_attendance_records.id) as total_attendees'),
-                DB::raw('COUNT(DISTINCT aph_attendance_events.id) as total_events'),
-                DB::raw('COUNT(DISTINCT aph_attendance_records.member_id) as unique_members'),
-                DB::raw('AVG(aph_attendance_records.guest_count) as avg_guests_per_event')
+                DB::raw('COUNT(DISTINCT chm_attendance_records.id) as total_attendees'),
+                DB::raw('COUNT(DISTINCT chm_attendance_events.id) as total_events'),
+                DB::raw('COUNT(DISTINCT chm_attendance_records.member_id) as unique_members'),
+                DB::raw('AVG(chm_attendance_records.guest_count) as avg_guests_per_event')
             ]);
 
         // Apply filters
         if (!empty($filters['ministry_id'])) {
-            $query->where('aph_attendance_events.ministry_id', $filters['ministry_id']);
+            $query->where('chm_attendance_events.ministry_id', $filters['ministry_id']);
         }
 
         if (!empty($filters['group_id'])) {
-            $query->where('aph_attendance_events.group_id', $filters['group_id']);
+            $query->where('chm_attendance_events.group_id', $filters['group_id']);
         }
 
         return $query->first()->toArray();
@@ -59,7 +59,7 @@ class ReportService
             ->select([
                 DB::raw("DATE_FORMAT(created_at, '{$format}') as period"),
                 DB::raw('COUNT(*) as new_members'),
-                DB::raw('(SELECT COUNT(*) FROM aph_members m2 WHERE m2.created_at <= MAX(aph_members.created_at)) as total_members')
+                DB::raw('(SELECT COUNT(*) FROM chm_members m2 WHERE m2.created_at <= MAX(chm_members.created_at)) as total_members')
             ])
             ->groupBy('period')
             ->orderBy('period')
@@ -104,13 +104,13 @@ class ReportService
         $format = $groupBy === 'month' ? '%Y-%m' : '%Y-%U';
         
         return AttendanceRecord::query()
-            ->join('aph_attendance_events', 'aph_attendance_records.event_id', '=', 'aph_attendance_events.id')
-            ->whereBetween('aph_attendance_events.start_time', [$startDate, $endDate])
+            ->join('chm_attendance_events', 'chm_attendance_records.event_id', '=', 'chm_attendance_events.id')
+            ->whereBetween('chm_attendance_events.start_time', [$startDate, $endDate])
             ->select([
-                DB::raw("DATE_FORMAT(aph_attendance_events.start_time, '{$format}') as period"),
-                DB::raw('COUNT(DISTINCT aph_attendance_records.id) as total_attendees'),
-                DB::raw('COUNT(DISTINCT aph_attendance_events.id) as total_events'),
-                DB::raw('COUNT(DISTINCT aph_attendance_records.member_id) as unique_members')
+                DB::raw("DATE_FORMAT(chm_attendance_events.start_time, '{$format}') as period"),
+                DB::raw('COUNT(DISTINCT chm_attendance_records.id) as total_attendees'),
+                DB::raw('COUNT(DISTINCT chm_attendance_events.id) as total_events'),
+                DB::raw('COUNT(DISTINCT chm_attendance_records.member_id) as unique_members')
             ])
             ->groupBy('period')
             ->orderBy('period')
@@ -162,8 +162,8 @@ class ReportService
     protected function getActiveMembersCount(Carbon $startDate, Carbon $endDate): int
     {
         return AttendanceRecord::query()
-            ->join('aph_attendance_events', 'aph_attendance_records.event_id', '=', 'aph_attendance_events.id')
-            ->whereBetween('aph_attendance_events.start_time', [$startDate, $endDate])
+            ->join('chm_attendance_events', 'chm_attendance_records.event_id', '=', 'chm_attendance_events.id')
+            ->whereBetween('chm_attendance_events.start_time', [$startDate, $endDate])
             ->distinct('member_id')
             ->count('member_id');
     }
@@ -186,8 +186,8 @@ class ReportService
         // This is a simplified calculation - adjust based on your requirements
         $totalEvents = AttendanceEvent::whereBetween('start_time', [$startDate, $endDate])->count();
         $totalAttendance = AttendanceRecord::query()
-            ->join('aph_attendance_events', 'aph_attendance_records.event_id', '=', 'aph_attendance_events.id')
-            ->whereBetween('aph_attendance_events.start_time', [$startDate, $endDate])
+            ->join('chm_attendance_events', 'chm_attendance_records.event_id', '=', 'chm_attendance_events.id')
+            ->whereBetween('chm_attendance_events.start_time', [$startDate, $endDate])
             ->count();
 
         return $totalEvents > 0 ? round($totalAttendance / $totalEvents, 2) : 0;
@@ -224,7 +224,7 @@ class ReportService
      */
     public function getGivingReport(Carbon $startDate, Carbon $endDate, array $filters = [])
     {
-        $query = DB::table('aph_donations')
+        $query = DB::table('chm_donations')
             ->whereBetween('donation_date', [$startDate, $endDate])
             ->select([
                 DB::raw('COUNT(DISTINCT id) as total_donations'),
@@ -245,15 +245,15 @@ class ReportService
         $stats = $query->first();
         
         // Get giving by category
-        $byCategory = DB::table('aph_donations')
-            ->join('aph_donation_categories', 'aph_donations.category_id', '=', 'aph_donation_categories.id')
+        $byCategory = DB::table('chm_donations')
+            ->join('chm_donation_categories', 'chm_donations.category_id', '=', 'chm_donation_categories.id')
             ->whereBetween('donation_date', [$startDate, $endDate])
             ->select([
-                'aph_donation_categories.name as category',
-                DB::raw('COUNT(aph_donations.id) as donation_count'),
+                'chm_donation_categories.name as category',
+                DB::raw('COUNT(chm_donations.id) as donation_count'),
                 DB::raw('SUM(amount) as total_amount')
             ])
-            ->groupBy('category_id', 'aph_donation_categories.name')
+            ->groupBy('category_id', 'chm_donation_categories.name')
             ->orderBy('total_amount', 'desc')
             ->get();
             

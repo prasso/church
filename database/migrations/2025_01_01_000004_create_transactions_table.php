@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aph_transactions', function (Blueprint $table) {
+        Schema::create('chm_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->nullable()->constrained('aph_members')->onDelete('set null');
+            $table->foreignId('member_id')->nullable()->constrained('chm_members')->onDelete('set null');
             $table->string('reference_id')->nullable()->comment('External reference ID (e.g., Stripe payment intent ID)');
             $table->decimal('amount', 10, 2);
             $table->string('currency', 3)->default('USD');
@@ -41,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_transactions');
+        Schema::dropIfExists('chm_transactions');
     }
 };

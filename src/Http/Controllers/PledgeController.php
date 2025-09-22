@@ -156,7 +156,7 @@ class PledgeController extends Controller
         
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01|max:' . $pledge->remaining_balance,
-            'transaction_id' => 'required|string|max:255|unique:aph_transactions,reference_id',
+            'transaction_id' => 'required|string|max:255|unique:chm_transactions,reference_id',
             'payment_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ]);

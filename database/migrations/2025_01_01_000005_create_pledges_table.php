@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aph_pledges', function (Blueprint $table) {
+        Schema::create('chm_pledges', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained('aph_members')->onDelete('cascade');
+            $table->foreignId('member_id')->constrained('chm_members')->onDelete('cascade');
             $table->string('campaign_name');
             $table->text('description')->nullable();
             $table->decimal('amount', 10, 2);
@@ -53,6 +53,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_pledges');
+        Schema::dropIfExists('chm_pledges');
     }
 };

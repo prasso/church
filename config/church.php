@@ -20,7 +20,7 @@ return [
     | church management system.
     |
     */
-    'table_prefix' => 'aph_',
+    'table_prefix' => 'chm_',
 
     /*
     |--------------------------------------------------------------------------

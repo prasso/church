@@ -38,7 +38,7 @@ return new class extends Migration
             
             // Relationships
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('ministry_id')->nullable()->constrained('aph_ministries')->onDelete('set null');
+            $table->foreignId('ministry_id')->nullable()->constrained('chm_ministries')->onDelete('set null');
             
             // Metadata
             $table->json('metadata')->nullable();
@@ -59,6 +59,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_events');
+        Schema::dropIfExists('chm_events');
     }
 };

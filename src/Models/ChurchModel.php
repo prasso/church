@@ -28,7 +28,7 @@ abstract class ChurchModel extends Model
     public function getTable()
     {
         if (! isset($this->table)) {
-            $this->table = 'aph_' . str_replace(
+            $this->table = 'chm_' . str_replace(
                 '\\', '', 
                 str_replace('Prasso\\Church\\Models\\', '', get_class($this))
             );

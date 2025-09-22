@@ -50,12 +50,12 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('set null');
 
-            // Note: The original ministry_id foreign key would have referenced aph_ministries
+            // Note: The original ministry_id foreign key would have referenced chm_ministries
             // but we'll leave this commented out since we want to use chm_ministries
             /*
             $table->foreign('ministry_id')
                 ->references('id')
-                ->on('aph_ministries')
+                ->on('chm_ministries')
                 ->onDelete('set null');
             */
         });

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aph_visitors', function (Blueprint $table) {
+        Schema::create('chm_visitors', function (Blueprint $table) {
             $table->id();
             
             // Visitor Information
@@ -47,7 +47,7 @@ return new class extends Migration
             
             // Conversion Information
             $table->boolean('converted_to_member')->default(false);
-            $table->foreignId('converted_to_member_id')->nullable()->constrained('aph_members');
+            $table->foreignId('converted_to_member_id')->nullable()->constrained('chm_members');
             $table->timestamp('converted_at')->nullable();
             
             // Assignment
@@ -69,6 +69,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aph_visitors');
+        Schema::dropIfExists('chm_visitors');
     }
 };

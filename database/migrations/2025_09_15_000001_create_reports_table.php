@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('aph_reports', function (Blueprint $table) {
+        Schema::create('chm_reports', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
@@ -23,9 +23,9 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('aph_report_schedules', function (Blueprint $table) {
+        Schema::create('chm_report_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('report_id')->constrained('aph_reports')->onDelete('cascade');
+            $table->foreignId('report_id')->constrained('chm_reports')->onDelete('cascade');
             $table->string('frequency'); // daily, weekly, monthly
             $table->string('time')->default('09:00');
             $table->string('day_of_week')->nullable(); // For weekly
@@ -37,10 +37,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('aph_report_runs', function (Blueprint $table) {
+        Schema::create('chm_report_runs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('report_id')->constrained('aph_reports')->onDelete('cascade');
-            $table->foreignId('schedule_id')->nullable()->constrained('aph_report_schedules')->onDelete('set null');
+            $table->foreignId('report_id')->constrained('chm_reports')->onDelete('cascade');
+            $table->foreignId('schedule_id')->nullable()->constrained('chm_report_schedules')->onDelete('set null');
             $table->string('status'); // pending, processing, completed, failed
             $table->text('error_message')->nullable();
             $table->string('file_path')->nullable();
@@ -53,8 +53,8 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('aph_report_runs');
-        Schema::dropIfExists('aph_report_schedules');
-        Schema::dropIfExists('aph_reports');
+        Schema::dropIfExists('chm_report_runs');
+        Schema::dropIfExists('chm_report_schedules');
+        Schema::dropIfExists('chm_reports');
     }
 };

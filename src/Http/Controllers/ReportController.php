@@ -187,7 +187,7 @@ class ReportController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'filters' => 'sometimes|array',
             'group_by' => 'sometimes|string|in:day,week,month,year',
-            'event_id' => 'required_if:report_type,event_attendance|integer|exists:aph_attendance_events,id'
+            'event_id' => 'required_if:report_type,event_attendance|integer|exists:chm_attendance_events,id'
         ]);
 
         try {

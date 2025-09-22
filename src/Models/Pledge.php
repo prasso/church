@@ -15,7 +15,7 @@ class Pledge extends Model
      *
      * @var string
      */
-    protected $table = 'aph_pledges';
+    protected $table = 'chm_pledges';
 
     /**
      * The attributes that are mass assignable.
