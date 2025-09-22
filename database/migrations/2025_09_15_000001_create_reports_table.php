@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('chm_reports')) {
         Schema::create('chm_reports', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -17,12 +18,14 @@ return new class extends Migration
             $table->json('columns')->nullable();
             $table->json('settings')->nullable();
             $table->boolean('is_public')->default(false);
-            $table->foreignId('created_by')->constrained('users')->onDelete('set null');
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
         });
+    }
 
+    if (!Schema::hasTable('chm_report_schedules')) {
         Schema::create('chm_report_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('report_id')->constrained('chm_reports')->onDelete('cascade');
@@ -36,8 +39,10 @@ return new class extends Migration
             $table->timestamp('last_run_at')->nullable();
             $table->timestamps();
         });
+    }
 
-        Schema::create('chm_report_runs', function (Blueprint $table) {
+    if (!Schema::hasTable('chm_report_runs')) {     
+               Schema::create('chm_report_runs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('report_id')->constrained('chm_reports')->onDelete('cascade');
             $table->foreignId('schedule_id')->nullable()->constrained('chm_report_schedules')->onDelete('set null');
@@ -49,6 +54,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
+    }
     }
 
     public function down()

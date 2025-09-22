@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chm_volunteer_positions', function (Blueprint $table) {
+        if (!Schema::hasTable('chm_volunteer_positions')) {
+            Schema::create('chm_volunteer_positions', function (Blueprint $table) {
             $table->id();
             
             // Basic information
@@ -54,7 +55,9 @@ return new class extends Migration
             $table->index('group_id');
             $table->index('is_active');
         });
-
+    }
+    if (!Schema::hasTable('chm_volunteer_assignments')) {
+        
         // Create volunteer_assignments table
         Schema::create('chm_volunteer_assignments', function (Blueprint $table) {
             $table->id();
@@ -95,13 +98,14 @@ return new class extends Migration
             $table->softDeletes();
             
             // Composite unique key
-            $table->unique(['member_id', 'position_id', 'start_date']);
+            $table->unique(['member_id', 'position_id', 'start_date'], 'chm_vol_assignments_unique');
             
             // Indexes
             $table->index(['member_id', 'status']);
             $table->index(['position_id', 'status']);
         });
     }
+}
 
     /**
      * Reverse the migrations.

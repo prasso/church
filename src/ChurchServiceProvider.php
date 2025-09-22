@@ -17,7 +17,7 @@ class ChurchServiceProvider extends ServiceProvider
     {
         // Register the configuration
         $this->mergeConfigFrom(
-            __DIR__.'/../../config/church.php', 'church'
+            __DIR__ . '/../config/church.php', 'church'
         );
         
         // Register the event service provider
@@ -36,31 +36,31 @@ class ChurchServiceProvider extends ServiceProvider
     {
         // Publish configuration file
         $this->publishes([
-            __DIR__.'/../../config/church.php' => config_path('church.php'),
+            __DIR__ . '/../config/church.php' => config_path('church.php'),
         ], 'church-config');
         
         // Load routes
-        $this->loadRoutesFrom(__DIR__.'/../../routes/api.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         
         // Load views
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'church');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'church');
         
         // Load migrations
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         
         // Publish migrations
         $this->publishes([
-            __DIR__.'/../../database/migrations' => database_path('migrations'),
+            __DIR__ . '/../database/migrations' => database_path('migrations'),
         ], 'church-migrations');
         
         // Publish views
         $this->publishes([
-            __DIR__.'/../../resources/views' => resource_path('views/vendor/church'),
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/church'),
         ], 'church-views');
         
         // Publish assets
         $this->publishes([
-            __DIR__.'/../../resources/assets' => public_path('vendor/church'),
+            __DIR__ . '/../resources/assets' => public_path('vendor/church'),
         ], 'church-assets');
     }
 }

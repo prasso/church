@@ -14,7 +14,8 @@ class CreateAttendanceTables extends Migration
     public function up()
     {
         // Attendance Events (services, classes, etc.)
-        Schema::create('chm_attendance_events', function (Blueprint $table) {
+        if (!Schema::hasTable('chm_attendance_events')) {
+             Schema::create('chm_attendance_events', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
@@ -35,7 +36,8 @@ class CreateAttendanceTables extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
+        }
+        if (!Schema::hasTable('chm_attendance_records')) {
         // Attendance Records
         Schema::create('chm_attendance_records', function (Blueprint $table) {
             $table->id();
@@ -56,7 +58,8 @@ class CreateAttendanceTables extends Migration
             $table->index(['event_id', 'member_id']);
             $table->index(['member_id', 'check_in_time']);
         });
-
+    }
+    if (!Schema::hasTable('chm_attendance_groups')) {
         // Attendance Groups (for grouping events)
         Schema::create('chm_attendance_groups', function (Blueprint $table) {
             $table->id();
@@ -67,7 +70,9 @@ class CreateAttendanceTables extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
-
+    }
+    
+    if (!Schema::hasTable('chm_attendance_group_members')) {
         // Pivot table for attendance group membership
         Schema::create('chm_attendance_group_members', function (Blueprint $table) {
             $table->id();
@@ -78,9 +83,11 @@ class CreateAttendanceTables extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
             
-            $table->unique(['group_id', 'attendable_id', 'attendable_type']);
+            $table->unique(['group_id', 'attendable_id', 'attendable_type'], 'chm_att_grp_mem_unique');
         });
-
+    }
+    
+    if (!Schema::hasTable('chm_attendance_summaries')) {
         // Attendance Summaries (pre-calculated for reporting)
         Schema::create('chm_attendance_summaries', function (Blueprint $table) {
             $table->id();
@@ -101,6 +108,7 @@ class CreateAttendanceTables extends Migration
             $table->index(['event_id', 'summary_date']);
         });
     }
+}
 
     /**
      * Reverse the migrations.

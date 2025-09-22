@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chm_events', function (Blueprint $table) {
+        if (!Schema::hasTable('chm_events')) {
+            Schema::create('chm_events', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
@@ -38,7 +39,7 @@ return new class extends Migration
             
             // Relationships
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('ministry_id')->nullable()->constrained('chm_ministries')->onDelete('set null');
+            $table->unsignedBigInteger('ministry_id')->nullable();
             
             // Metadata
             $table->json('metadata')->nullable();
@@ -46,12 +47,12 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            // Indexes
             $table->index('type');
             $table->index('status');
             $table->index('start_date');
             $table->index('end_date');
         });
+        }
     }
 
     /**

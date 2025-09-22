@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chm_attendances', function (Blueprint $table) {
+        if (!Schema::hasTable('chm_attendances')) {
+            Schema::create('chm_attendances', function (Blueprint $table) {
             $table->id();
             
             // Relationships
@@ -35,14 +36,23 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             
             $table->timestamps();
-            
-            // Indexes
-            $table->index('event_occurrence_id');
-            $table->index('member_id');
-            $table->index('family_id');
-            $table->index('status');
-            $table->index('check_in_time');
         });
+        }
+
+        // Create indexes separately to handle existing tables
+        if (Schema::hasTable('chm_attendances')) {
+            try {
+                Schema::table('chm_attendances', function (Blueprint $table) {
+                    $table->index('occurrence_id');
+                    $table->index('member_id');
+                    $table->index('family_id');
+                    $table->index('status');
+                    $table->index('check_in_time');
+                });
+            } catch (\Exception $e) {
+                // Indexes might already exist, continue
+            }
+        }
     }
 
     /**
