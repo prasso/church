@@ -3,6 +3,7 @@
 namespace Prasso\Church\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Prasso\Church\Models\PrayerRequest;
 use Prasso\Church\Models\Member;
 use Prasso\Messaging\Models\MsgInboundMessage;
@@ -227,5 +228,70 @@ class SmsPrayerRequestService
         $guest->messages()->attach($message->id);
 
         return $message;
+    }
+    
+    /**
+     * Generate a downloadable text file of SMS prayer requests.
+     *
+     * @param  bool  $allRequests  Whether to include all prayer requests or just SMS ones
+     * @param  int|null  $days  Number of days to limit the results to
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadPrayerRequestsAsText($allRequests = false, $days = null)
+    {
+        $query = $allRequests ? PrayerRequest::query() : PrayerRequest::fromSms();
+        
+        if ($days) {
+            $query->where('created_at', '>=', now()->subDays($days));
+        }
+        
+        $records = $query->orderBy('created_at', 'desc')->get();
+        
+        $title = $allRequests ? 'ALL PRAYER REQUESTS' : 'SMS PRAYER REQUESTS';
+        $content = "$title\n";
+        $content .= "Generated: " . now()->format('F j, Y g:i A') . "\n";
+        $content .= "Total: " . $records->count() . "\n\n";
+        
+        foreach ($records as $index => $record) {
+            $content .= "#" . ($index + 1) . " - " . $record->title . "\n";
+            $content .= "Status: " . ucfirst($record->status) . "\n";
+            $content .= "Date: " . $record->created_at->format('M j, Y') . "\n";
+            
+            if ($record->member) {
+                $content .= "For: " . $record->member->full_name . "\n";
+            }
+            
+            if ($record->requestedBy) {
+                $content .= "Requested By: " . $record->requestedBy->full_name . "\n";
+            }
+            
+            if (isset($record->metadata['source']) && $record->metadata['source'] === 'sms') {
+                $content .= "Source: SMS\n";
+                
+                if (isset($record->metadata['phone'])) {
+                    $content .= "Phone: " . $record->metadata['phone'] . "\n";
+                }
+                
+                if (isset($record->metadata['sender_name'])) {
+                    $content .= "Sender: " . $record->metadata['sender_name'] . "\n";
+                }
+            }
+            
+            $content .= "\nRequest:\n" . $record->description . "\n\n";
+            
+            if ($record->status === 'answered' && !empty($record->answer)) {
+                $content .= "Answer: " . $record->answer . "\n";
+                $content .= "Answered on: " . $record->answered_at->format('M j, Y') . "\n";
+            }
+            
+            $content .= "\n" . str_repeat('-', 40) . "\n\n";
+        }
+        
+        $filename = $allRequests ? 'all-prayer-requests.txt' : 'sms-prayer-requests.txt';
+        
+        return Response::make($content, 200, [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

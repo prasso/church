@@ -11,6 +11,7 @@ use Prasso\Church\Filament\Widgets\ChurchRecentActivity;
 use Prasso\Church\Filament\Widgets\SmsPrayerRequestsWidget;
 use Prasso\Church\Filament\Pages\SmsPrayerRequests;
 use Prasso\Church\Filament\Resources\PrayerRequestResource;
+use Prasso\Church\Filament\Resources\VolunteerPositionResource;
 
 class FilamentServiceProvider extends ServiceProvider
 {
@@ -48,6 +49,7 @@ class FilamentServiceProvider extends ServiceProvider
         // Register resources
         Filament::registerResources([
             PrayerRequestResource::class,
+            VolunteerPositionResource::class,
         ]);
     }
 }

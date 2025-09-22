@@ -69,13 +69,13 @@ class ChurchMembershipGrowth extends BaseWidget
                 ->description("{$activityRate}% activity rate (30 days)")
                 ->icon('heroicon-o-users')
                 ->color('primary')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-member-resource.index')),
+                ->url(route('filament.site-admin.resources.members.index')),
 
             Stat::make('Group Participation', $totalMembersInGroups . ' members')
                 ->description("{$groupParticipationRate}% in groups")
                 ->icon('heroicon-o-user-group')
                 ->color('info')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-group-resource.index')),
+                ->url(route('filament.site-admin.resources.groups.index')),
 
             Stat::make('Weekly Attendance', $lastWeekAttendance)
                 ->description($attendanceChange >= 0 ? "+{$attendanceChange}% vs average" : "{$attendanceChange}% vs average")

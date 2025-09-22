@@ -64,14 +64,9 @@ class SmsPrayerRequestsWidget extends BaseWidget
                 ->url(route('filament.site-admin.resources.prayer-requests.index', [
                     'tableFilters[from_sms]' => true,
                 ])),
-            \Filament\Actions\Action::make('printAll')
-                ->label('Print SMS Requests')
-                ->url(route('church.prayer-requests.print-sms'))
-                ->openUrlInNewTab(),
             \Filament\Actions\Action::make('downloadText')
                 ->label('Download as Text')
-                ->url(route('church.prayer-requests.print-sms', ['format' => 'text']))
-                ->openUrlInNewTab(),
+                ->url(route('filament.site-admin.resources.prayer-requests.index', ['tableFilters[from_sms]' => true])),
         ];
     }
 }

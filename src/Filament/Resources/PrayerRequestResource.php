@@ -241,16 +241,17 @@ class PrayerRequestResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('print')
-                    ->label('Print')
-                    ->icon('heroicon-o-printer')
-                    ->url(fn (PrayerRequest $record) => route('church.prayer-requests.print', $record->id))
-                    ->openUrlInNewTab(),
-                Tables\Actions\Action::make('downloadText')
+                Tables\Actions\Action::make('download')
                     ->label('Download as Text')
                     ->icon('heroicon-o-document-text')
-                    ->url(fn (PrayerRequest $record) => route('church.prayer-requests.print', ['id' => $record->id, 'format' => 'text']))
-                    ->openUrlInNewTab(),
+                    ->action(function (PrayerRequest $record) {
+                        $content = static::generateTextContent($record);
+                        $filename = 'prayer-request-' . $record->id . '.txt';
+                        
+                        return response($content)
+                            ->header('Content-Type', 'text/plain')
+                            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -276,21 +277,52 @@ class PrayerRequestResource extends Resource
                                 ]);
                             }
                         }),
-                    Tables\Actions\BulkAction::make('printSelected')
-                        ->label('Print Selected')
-                        ->icon('heroicon-o-printer')
-                        ->action(function (Collection $records) {
-                            $ids = $records->pluck('id')->implode(',');
-                            $url = route('church.prayer-requests.print-multiple', ['ids' => $ids]);
-                            redirect()->away($url);
-                        }),
-                    Tables\Actions\BulkAction::make('downloadSelectedText')
+                    Tables\Actions\BulkAction::make('downloadSelected')
                         ->label('Download Selected as Text')
                         ->icon('heroicon-o-document-text')
                         ->action(function (Collection $records) {
-                            $ids = $records->pluck('id')->implode(',');
-                            $url = route('church.prayer-requests.print-multiple', ['ids' => $ids, 'format' => 'text']);
-                            redirect()->away($url);
+                            $content = "PRAYER REQUESTS\n";
+                            $content .= "Generated: " . now()->format('F j, Y g:i A') . "\n";
+                            $content .= "Total: " . $records->count() . "\n\n";
+                            
+                            foreach ($records as $index => $record) {
+                                $content .= "#" . ($index + 1) . " - " . $record->title . "\n";
+                                $content .= "Status: " . ucfirst($record->status) . "\n";
+                                $content .= "Date: " . $record->created_at->format('M j, Y') . "\n";
+                                
+                                if ($record->member) {
+                                    $content .= "For: " . $record->member->full_name . "\n";
+                                }
+                                
+                                if ($record->requestedBy) {
+                                    $content .= "Requested By: " . $record->requestedBy->full_name . "\n";
+                                }
+                                
+                                if (isset($record->metadata['source']) && $record->metadata['source'] === 'sms') {
+                                    $content .= "Source: SMS\n";
+                                    
+                                    if (isset($record->metadata['phone'])) {
+                                        $content .= "Phone: " . $record->metadata['phone'] . "\n";
+                                    }
+                                    
+                                    if (isset($record->metadata['sender_name'])) {
+                                        $content .= "Sender: " . $record->metadata['sender_name'] . "\n";
+                                    }
+                                }
+                                
+                                $content .= "\nRequest:\n" . $record->description . "\n\n";
+                                
+                                if ($record->status === 'answered' && !empty($record->answer)) {
+                                    $content .= "Answer: " . $record->answer . "\n";
+                                    $content .= "Answered on: " . $record->answered_at->format('M j, Y') . "\n";
+                                }
+                                
+                                $content .= "\n" . str_repeat('-', 40) . "\n\n";
+                            }
+                            
+                            return response($content)
+                                ->header('Content-Type', 'text/plain')
+                                ->header('Content-Disposition', 'attachment; filename="prayer-requests.txt"');
                         }),
                 ]),
             ]);
@@ -301,6 +333,49 @@ class PrayerRequestResource extends Resource
         return [
             //
         ];
+    }
+    
+    /**
+     * Generate a plain text version of the prayer request.
+     *
+     * @param  \Prasso\Church\Models\PrayerRequest  $record
+     * @return string
+     */
+    public static function generateTextContent($record)
+    {
+        $content = "PRAYER REQUEST\n";
+        $content .= "Title: {$record->title}\n";
+        $content .= "Status: " . ucfirst($record->status) . "\n";
+        $content .= "Date: " . $record->created_at->format('M j, Y') . "\n";
+        
+        if ($record->member) {
+            $content .= "For: {$record->member->full_name}\n";
+        }
+        
+        if ($record->requestedBy) {
+            $content .= "Requested By: {$record->requestedBy->full_name}\n";
+        }
+        
+        if (isset($record->metadata['source']) && $record->metadata['source'] === 'sms') {
+            $content .= "Source: SMS\n";
+            
+            if (isset($record->metadata['phone'])) {
+                $content .= "Phone: {$record->metadata['phone']}\n";
+            }
+            
+            if (isset($record->metadata['sender_name'])) {
+                $content .= "Sender: {$record->metadata['sender_name']}\n";
+            }
+        }
+        
+        $content .= "\nRequest:\n{$record->description}\n\n";
+        
+        if ($record->status === 'answered' && !empty($record->answer)) {
+            $content .= "Answer: {$record->answer}\n";
+            $content .= "Answered on: " . $record->answered_at->format('M j, Y') . "\n";
+        }
+        
+        return $content;
     }
 
     public static function getPages(): array

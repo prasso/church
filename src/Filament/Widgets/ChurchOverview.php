@@ -40,25 +40,25 @@ class ChurchOverview extends BaseWidget
                 ->description('Church membership')
                 ->icon('heroicon-o-users')
                 ->color('primary')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-member-resource.index')),
+                ->url(route('filament.site-admin.resources.members.index')),
 
             Stat::make('Active Groups', $activeGroups)
                 ->description('Small groups & ministries')
                 ->icon('heroicon-o-user-group')
                 ->color('success')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-group-resource.index')),
+                ->url(route('filament.site-admin.resources.groups.index')),
 
             Stat::make('Upcoming Events', $upcomingEvents)
                 ->description('Next 7 days')
                 ->icon('heroicon-o-calendar-days')
                 ->color('warning')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-event-resource.index')),
+                ->url(route('filament.site-admin.resources.events.index')),
 
             Stat::make('Pending Prayer Requests', $pendingPrayerRequests)
                 ->description('Need attention')
                 ->icon('heroicon-o-heart')
                 ->color($pendingPrayerRequests > 0 ? 'danger' : 'gray')
-                ->url(route('filament.site-admin.resources.prasso-church-filament-resources-prayer-request-resource.index')),
+                ->url(route('filament.site-admin.resources.prayer-requests.index')),
         ];
     }
 }

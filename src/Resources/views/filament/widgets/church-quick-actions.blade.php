@@ -82,7 +82,7 @@
             @endforelse
             
             <div class="mt-2">
-                <a href="{{ route('filament.church.resources.prayer-requests.index') }}" class="text-primary-600 hover:text-primary-500 text-sm font-medium">
+                <a href="{{ route('filament.site-admin.resources.prayer-requests.index') }}" class="text-primary-600 hover:text-primary-500 text-sm font-medium">
                     View all prayer requests →
                 </a>
             </div>
@@ -130,20 +130,11 @@
                 <p class="text-gray-500 dark:text-gray-400">No SMS prayer requests.</p>
             @endforelse
             
-            <div class="mt-4 flex justify-between">
-                <a href="{{ route('filament.site-admin.resources.prayer-requests.index', ['tableFilters[from_sms]' => true]) }}" class="text-primary-600 hover:text-primary-500 text-sm font-medium">
-                    View all SMS requests →
+            <div class="mt-4 text-center">
+                <a href="{{ route('filament.site-admin.resources.prayer-requests.index', ['tableFilters[from_sms]' => true]) }}" class="text-primary-600 hover:text-primary-500 text-sm font-medium flex items-center justify-center">
+                    <x-heroicon-o-eye class="w-4 h-4 mr-1" />
+                    View all SMS prayer requests
                 </a>
-                <div>
-                    <a href="{{ route('church.prayer-requests.print-sms') }}" target="_blank" class="text-primary-600 hover:text-primary-500 text-sm font-medium flex items-center mr-4 inline-block">
-                        <x-heroicon-o-printer class="w-4 h-4 mr-1" />
-                        Print
-                    </a>
-                    <a href="{{ route('church.prayer-requests.print-sms', ['format' => 'text']) }}" target="_blank" class="text-primary-600 hover:text-primary-500 text-sm font-medium flex items-center inline-block">
-                        <x-heroicon-o-document-text class="w-4 h-4 mr-1" />
-                        Download Text
-                    </a>
-                </div>
             </div>
         </div>
     </x-filament::section>
