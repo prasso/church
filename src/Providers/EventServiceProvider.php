@@ -12,12 +12,14 @@ use Prasso\Church\Events\AttendanceEventDeleted;
 use Prasso\Church\Events\AttendanceRecorded;
 use Prasso\Church\Events\AttendanceUpdated;
 use Prasso\Church\Events\AttendanceDeleted;
+use Prasso\Church\Events\InboundMessageReceived;
 use Prasso\Church\Listeners\SendPrayerRequestNotification;
 use Prasso\Church\Listeners\SendPastoralVisitAssignedNotification;
 use Prasso\Church\Listeners\SendPastoralVisitCompletedNotification;
 use Prasso\Church\Listeners\SendAttendanceEventNotification;
 use Prasso\Church\Listeners\SendAttendanceRecordNotification;
 use Prasso\Church\Listeners\UpdateAttendanceSummaries;
+use Prasso\Church\Listeners\ProcessPrayerRequestMessage;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -64,6 +66,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         AttendanceDeleted::class => [
             UpdateAttendanceSummaries::class,
+        ],
+        
+        // SMS Prayer Request Events
+        InboundMessageReceived::class => [
+            ProcessPrayerRequestMessage::class,
         ],
     ];
 

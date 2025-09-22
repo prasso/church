@@ -32,9 +32,6 @@ class ChurchServiceProvider extends ServiceProvider
         $router = $this->app['router'];
         $router->aliasMiddleware('church.auth', \Prasso\Church\Http\Middleware\AuthenticateWithSanctum::class);
         
-        // Register event listeners
-        $this->registerEventListeners();
-        
         // Publish assets
         $this->publishes([
             __DIR__.'/../../resources/assets' => public_path('vendor/church'),
@@ -48,29 +45,6 @@ class ChurchServiceProvider extends ServiceProvider
         }
     }
     
-    /**
-     * Register the package's event listeners.
-     *
-     * @return void
-     */
-    protected function registerEventListeners()
-    {
-        $events = $this->app['events'];
-        
-        // Member events
-        $events->listen(
-            \Prasso\Church\Events\MemberCreated::class,
-            \Prasso\Church\Listeners\SendWelcomeMessage::class
-        );
-        
-        // Visitor events
-        $events->listen(
-            \Prasso\Church\Events\VisitorCreated::class,
-            \Prasso\Church\Listeners\SendVisitorFollowUp::class
-        );
-    }
-    }
-
     /**
      * Register the package routes.
      */
@@ -119,27 +93,6 @@ class ChurchServiceProvider extends ServiceProvider
         ];
     }
 
-    /**
-     * Register the package's event listeners.
-     *
-     * @return void
-     */
-    protected function registerEventListeners()
-    {
-        $events = $this->app['events'];
-        
-        // Member events
-        $events->listen(
-            \Prasso\Church\Events\MemberCreated::class,
-            \Prasso\Church\Listeners\SendWelcomeMessage::class
-        );
-        
-        // Visitor events
-        $events->listen(
-            \Prasso\Church\Events\VisitorCreated::class,
-            \Prasso\Church\Listeners\SendVisitorFollowUp::class
-        );
-    }
 
     /**
      * Register any application services.
@@ -163,10 +116,20 @@ class ChurchServiceProvider extends ServiceProvider
             return new \Prasso\Church\Services\ChurchMessagingService();
         });
         
+        // Register the SMS prayer request service
+        $this->app->singleton('church.sms_prayer', function ($app) {
+            return new \Prasso\Church\Services\SmsPrayerRequestService();
+        });
+        
         // Register the financial service
         $this->app->singleton('church.financial', function ($app) {
             return new \Prasso\Church\Services\FinancialService();
         });
+        
+        // Register service providers
+        $this->app->register(EventServiceProvider::class);
+        $this->app->register(MessagingIntegrationServiceProvider::class);
+        $this->app->register(FilamentServiceProvider::class);
         
         // Register view namespace
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'church');

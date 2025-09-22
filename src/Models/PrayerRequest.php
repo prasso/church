@@ -134,4 +134,46 @@ class PrayerRequest extends ChurchModel
     {
         return $this->increment('prayer_count', $amount);
     }
+    
+    /**
+     * Scope a query to only include prayer requests from SMS.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFromSms($query)
+    {
+        return $query->whereJsonContains('metadata->source', 'sms');
+    }
+    
+    /**
+     * Create a prayer request from an SMS message.
+     *
+     * @param  array  $smsData
+     * @param  array  $attributes
+     * @return static
+     */
+    public static function createFromSms(array $smsData, array $attributes = [])
+    {
+        $metadata = [
+            'source' => 'sms',
+            'phone' => $smsData['from'] ?? null,
+            'msg_inbound_message_id' => $smsData['inbound_message_id'] ?? null,
+            'msg_guest_id' => $smsData['guest_id'] ?? null,
+            'received_at' => $smsData['received_at'] ?? now()->toDateTimeString(),
+        ];
+        
+        if (!empty($smsData['campaign_id'])) {
+            $metadata['campaign_id'] = $smsData['campaign_id'];
+        }
+        
+        return static::create(array_merge([
+            'title' => $attributes['title'] ?? 'Prayer Request from SMS',
+            'description' => $smsData['body'] ?? '',
+            'is_anonymous' => $attributes['is_anonymous'] ?? false,
+            'is_public' => $attributes['is_public'] ?? true,
+            'status' => $attributes['status'] ?? 'pending',
+            'metadata' => $metadata,
+        ], $attributes));
+    }
 }

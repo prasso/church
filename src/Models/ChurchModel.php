@@ -28,12 +28,14 @@ abstract class ChurchModel extends Model
     public function getTable()
     {
         if (! isset($this->table)) {
-            $this->table = 'chm_' . str_replace(
-                '\\', '', 
-                str_replace('Prasso\\Church\\Models\\', '', get_class($this))
-            );
+            // Get the class name without namespace
+            $className = class_basename($this);
             
-            $this->table = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->table)) . 's';
+            // Convert to snake case
+            $snakeCase = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $className));
+            
+            // Add prefix and pluralize
+            $this->table = 'chm_' . $snakeCase . 's';
         }
         
         return $this->table;

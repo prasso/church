@@ -141,7 +141,7 @@ class EventOccurrence extends ChurchModel
     /**
      * Cancel the occurrence.
      */
-    public function cancel(string $reason = null): bool
+    public function cancel(?string $reason = null): bool
     {
         $this->status = 'cancelled';
         $this->cancellation_reason = $reason;

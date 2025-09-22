@@ -4,6 +4,7 @@ namespace Prasso\Church;
 
 use Illuminate\Support\ServiceProvider;
 use Prasso\Church\Providers\EventServiceProvider;
+use Prasso\Church\Filament\FilamentServiceProvider;
 use Prasso\Church\Providers\PastoralCareServiceProvider;
 
 class ChurchServiceProvider extends ServiceProvider
@@ -25,6 +26,9 @@ class ChurchServiceProvider extends ServiceProvider
         
         // Register the pastoral care service provider
         $this->app->register(PastoralCareServiceProvider::class);
+        
+        // Register the Filament service provider
+        $this->app->register(FilamentServiceProvider::class);
     }
 
     /**
