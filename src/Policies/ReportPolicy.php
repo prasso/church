@@ -5,14 +5,14 @@ namespace Prasso\Church\Policies;
 use Prasso\Church\Models\Report;
 use Prasso\Church\Models\ReportRun;
 use Prasso\Church\Models\ReportSchedule;
-use Prasso\Church\Models\User;
+use App\Models\User;
 
 class ReportPolicy
 {
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @return bool
      */
     public function viewAny(User $user): bool
@@ -23,7 +23,7 @@ class ReportPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\Report  $report
      * @return bool
      */
@@ -40,7 +40,7 @@ class ReportPolicy
     /**
      * Determine whether the user can create models.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @return bool
      */
     public function create(User $user): bool
@@ -51,7 +51,7 @@ class ReportPolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\Report  $report
      * @return bool
      */
@@ -64,7 +64,7 @@ class ReportPolicy
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\Report  $report
      * @return bool
      */
@@ -77,7 +77,7 @@ class ReportPolicy
     /**
      * Determine whether the user can run the report.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\Report  $report
      * @return bool
      */
@@ -89,7 +89,7 @@ class ReportPolicy
     /**
      * Determine whether the user can download the report.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\ReportRun  $run
      * @return bool
      */
@@ -102,7 +102,7 @@ class ReportPolicy
     /**
      * Determine whether the user can manage the report schedule.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\ReportSchedule  $schedule
      * @return bool
      */
@@ -114,7 +114,7 @@ class ReportPolicy
     /**
      * Determine whether the user can delete the report schedule.
      *
-     * @param  \Prasso\Church\Models\User  $user
+     * @param  \App\Models\User  $user
      * @param  \Prasso\Church\Models\ReportSchedule  $schedule
      * @return bool
      */

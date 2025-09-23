@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Carbon\Carbon;
+use App\Models\User;
 
 class AttendanceEvent extends Model
 {
@@ -25,6 +26,7 @@ class AttendanceEvent extends Model
         'event_type_id',
         'ministry_id',
         'group_id',
+        'attendance_group_id',
         'expected_attendance',
         'notes',
         'requires_check_in',
@@ -76,6 +78,14 @@ class AttendanceEvent extends Model
     }
 
     /**
+     * Get the attendance roster associated with the event.
+     */
+    public function attendanceGroup(): BelongsTo
+    {
+        return $this->belongsTo(AttendanceGroup::class, 'attendance_group_id');
+    }
+
+    /**
      * Get the attendance records for the event.
      */
     public function attendanceRecords(): HasMany
@@ -88,7 +98,7 @@ class AttendanceEvent extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 
     /**
@@ -96,7 +106,7 @@ class AttendanceEvent extends Model
      */
     public function updater(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
     }
 
     /**

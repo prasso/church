@@ -57,25 +57,15 @@ class EventResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                        Forms\Components\Select::make('type')
-                            ->options([
-                                'service' => 'Worship Service',
-                                'meeting' => 'Meeting',
-                                'class' => 'Class/Study',
-                                'outreach' => 'Outreach',
-                                'fellowship' => 'Fellowship',
-                                'other' => 'Other',
-                            ])
+                        Forms\Components\Select::make('event_type_id')
+                            ->label('Type')
+                            ->relationship('eventType', 'name')
+                            ->searchable()
+                            ->preload()
                             ->required(),
-                        Forms\Components\Select::make('location_id')
-                            ->relationship('location', 'name')
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\Select::make('group_id')
-                            ->label('Hosting Group')
-                            ->relationship('group', 'name')
-                            ->searchable()
-                            ->preload(),
+                        Forms\Components\TextInput::make('location')
+                            ->label('Location')
+                            ->maxLength(255),
                         Forms\Components\Select::make('ministry_id')
                             ->relationship('ministry', 'name')
                             ->searchable()
@@ -160,18 +150,22 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\TextColumn::make('eventType.name')
+                    ->label('Type')
                     ->badge()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('location.name')
+                Tables\Columns\TextColumn::make('location')
+                    ->label('Location')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('nextOccurrence.date')
+                Tables\Columns\TextColumn::make('next_date')
                     ->label('Next Date')
+                    ->getStateUsing(fn (\Prasso\Church\Models\Event $record) => optional($record->nextOccurrence())->date)
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('nextOccurrence.start_time')
+                Tables\Columns\TextColumn::make('next_time')
                     ->label('Time')
+                    ->getStateUsing(fn (\Prasso\Church\Models\Event $record) => optional($record->nextOccurrence())->start_time)
                     ->time(),
                 Tables\Columns\IconColumn::make('is_recurring')
                     ->boolean()
@@ -184,24 +178,18 @@ class EventResource extends Resource
                     ->label('Public'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->options([
-                        'service' => 'Worship Service',
-                        'meeting' => 'Meeting',
-                        'class' => 'Class/Study',
-                        'outreach' => 'Outreach',
-                        'fellowship' => 'Fellowship',
-                        'other' => 'Other',
-                    ]),
-                Tables\Filters\SelectFilter::make('location')
-                    ->relationship('location', 'name'),
+                Tables\Filters\SelectFilter::make('event_type_id')
+                    ->label('Type')
+                    ->relationship('eventType', 'name')
+                    ->multiple()
+                    ->preload(),
                 Tables\Filters\Filter::make('upcoming')
                     ->query(fn (Builder $query): Builder => $query->whereHas('occurrences', function ($query) {
                         $query->where('date', '>=', now());
                     }))
                     ->label('Upcoming Events'),
                 Tables\Filters\Filter::make('recurring')
-                    ->query(fn (Builder $query): Builder => $query->where('is_recurring', true))
+                    ->query(fn (Builder $query): Builder => $query->where('recurrence_pattern', '!=', 'none'))
                     ->label('Recurring Events'),
             ])
             ->actions([

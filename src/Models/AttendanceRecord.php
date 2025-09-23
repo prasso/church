@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use App\Models\User;
 
 class AttendanceRecord extends Model
 {
@@ -63,7 +64,7 @@ class AttendanceRecord extends Model
      */
     public function checkedInBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'checked_in_by');
+        return $this->belongsTo(\App\Models\User::class, 'checked_in_by');
     }
 
     /**

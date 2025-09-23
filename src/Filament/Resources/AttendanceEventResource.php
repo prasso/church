@@ -61,6 +61,7 @@ class AttendanceEventResource extends Resource
                         Forms\Components\Select::make('event_type_id')
                             ->label('Event Type')
                             ->relationship('eventType', 'name')
+                            ->required()
                             ->searchable(),
                     ])->columns(2),
                 
@@ -74,6 +75,11 @@ class AttendanceEventResource extends Resource
                             ->label('Group')
                             ->relationship('group', 'name')
                             ->searchable(),
+                        Forms\Components\Select::make('attendance_group_id')
+                            ->label('Roster')
+                            ->relationship('attendanceGroup', 'name')
+                            ->searchable()
+                            ->helperText('Optionally select a roster (attendance group) that can include members, families, or groups.'),
                         Forms\Components\TextInput::make('expected_attendance')
                             ->numeric()
                             ->minValue(0),
@@ -122,6 +128,9 @@ class AttendanceEventResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('group.name')
                     ->label('Group')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('attendanceGroup.name')
+                    ->label('Roster')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_recurring')
                     ->boolean()

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
 
 class Report extends Model
 {
@@ -63,7 +64,7 @@ class Report extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 
     /**
@@ -71,7 +72,7 @@ class Report extends Model
      */
     public function updater(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
     }
 
     /**

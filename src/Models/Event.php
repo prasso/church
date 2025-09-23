@@ -30,7 +30,7 @@ class Event extends ChurchModel
     protected $fillable = [
         'title',
         'description',
-        'type',
+        'event_type_id',
         'location',
         'image_url',
         'recurrence_pattern',
@@ -73,7 +73,6 @@ class Event extends ChurchModel
      * @var array
      */
     protected $attributes = [
-        'type' => 'service',
         'status' => 'draft',
         'recurrence_pattern' => 'none',
         'recurrence_interval' => 1,
@@ -111,6 +110,16 @@ class Event extends ChurchModel
     }
 
     /**
+     * Get the event type for this event.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function eventType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(EventType::class, 'event_type_id');
+    }
+
+    /**
      * Get the attendees for the event.
      */
     public function attendees()
@@ -141,7 +150,9 @@ class Event extends ChurchModel
      */
     public function scopeOfType($query, $type)
     {
-        return $query->where('type', $type);
+        return $query->whereHas('eventType', function ($query) use ($type) {
+            $query->where('slug', $type);
+        });
     }
 
     /**
