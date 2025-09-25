@@ -130,6 +130,10 @@ For details on package responsibilities and ecosystem architecture, see the [Pra
 - Background Check Integration
   - Streamline volunteer screening with third parties
 
+### Messaging Integration
+
+For details on how this package integrates with the Messaging package without circular dependencies (including the `MemberContact` interface and configuration via `MESSAGING_MEMBER_MODEL`), see `packages/prasso/church/docs/MESSAGING_INTEGRATION.md`.
+
 ## Compliance & Security
 
 - Data Privacy Protection

@@ -18,8 +18,9 @@ use Prasso\Church\Models\PrayerRequest;
 use Prasso\Church\Models\Skill;
 use Prasso\Church\Models\Transaction;
 use Prasso\Church\Models\VolunteerPosition;
+use Prasso\Messaging\Contracts\MemberContact;
 
-class Member extends ChurchModel
+class Member extends ChurchModel implements MemberContact
 {
     /**
      * The event map for the model.
@@ -173,5 +174,30 @@ class Member extends ChurchModel
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+    }
+
+    /**
+     * MemberContact interface implementation
+     */
+    public function getMemberId()
+    {
+        return $this->getKey();
+    }
+
+    public function getMemberEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function getMemberPhone(): ?string
+    {
+        // Use attribute accessor if present, else raw property
+        return $this->getAttribute('phone');
+    }
+
+    public function getMemberDisplayName(): ?string
+    {
+        // Prefer accessor full_name when available
+        return $this->full_name ?: trim("{$this->first_name} {$this->last_name}") ?: null;
     }
 }
