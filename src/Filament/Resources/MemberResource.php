@@ -99,7 +99,7 @@ class MemberResource extends Resource
                         Forms\Components\TextInput::make('city')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('state')
-                            ->maxLength(255),
+                            ->maxLength(2),
                         Forms\Components\TextInput::make('postal_code')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('country')
@@ -113,12 +113,13 @@ class MemberResource extends Resource
                             ->label('Date Joined'),
                         Forms\Components\Select::make('membership_status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
                                 'visitor' => 'Visitor',
-                                'pending' => 'Pending',
+                                'regular_attendee' => 'Regular Attendee',
+                                'member' => 'Member',
+                                'inactive' => 'Inactive',
+                                'removed' => 'Removed',
                             ])
-                            ->default('active')
+                            ->default('member')
                             ->required(),
                         Forms\Components\DatePicker::make('baptism_date')
                             ->label('Baptism Date'),
@@ -162,10 +163,11 @@ class MemberResource extends Resource
                 Tables\Columns\TextColumn::make('membership_status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'danger',
+                        'member' => 'success',
+                        'inactive' => 'warning',
+                        'removed' => 'danger',
                         'visitor' => 'warning',
-                        'pending' => 'info',
+                        'regular_attendee' => 'info',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('membership_date')
