@@ -74,6 +74,19 @@ class EventResource extends Resource
                 
                 Forms\Components\Section::make(__('Event Details'))
                     ->schema([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Start Date')
+                            ->required(),
+                        Forms\Components\TimePicker::make('start_time')
+                            ->label('Start Time')
+                            ->seconds(false)
+                            ->required(),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('End Date')
+                            ->helperText('Leave empty for no end date'),
+                        Forms\Components\TimePicker::make('end_time')
+                            ->label('End Time')
+                            ->seconds(false),
                         Forms\Components\TextInput::make('capacity')
                             ->numeric()
                             ->minValue(1),

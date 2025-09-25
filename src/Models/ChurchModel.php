@@ -3,6 +3,7 @@
 namespace Prasso\Church\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 abstract class ChurchModel extends Model
 {
@@ -30,12 +31,13 @@ abstract class ChurchModel extends Model
         if (! isset($this->table)) {
             // Get the class name without namespace
             $className = class_basename($this);
-            
-            // Convert to snake case
-            $snakeCase = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $className));
-            
-            // Add prefix and pluralize
-            $this->table = 'chm_' . $snakeCase . 's';
+
+            // Convert to snake_case and pluralize properly
+            $snakeCase = Str::snake($className);
+            $plural = Str::plural($snakeCase);
+
+            // Add prefix
+            $this->table = 'chm_' . $plural;
         }
         
         return $this->table;

@@ -3,6 +3,7 @@
 namespace Prasso\Church;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Prasso\Church\Providers\EventServiceProvider;
 use Prasso\Church\Filament\FilamentServiceProvider;
 use Prasso\Church\Providers\PastoralCareServiceProvider;
@@ -43,8 +44,13 @@ class ChurchServiceProvider extends ServiceProvider
             __DIR__ . '/../config/church.php' => config_path('church.php'),
         ], 'church-config');
         
-        // Load routes
+        // Load API routes
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+
+        // Load Web routes (ensure 'web' middleware is applied)
+        Route::middleware('web')->group(function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        });
         
         // Load views
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'church');

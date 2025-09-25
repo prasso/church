@@ -71,12 +71,15 @@ class PastoralVisitResource extends Resource
                             ->default('scheduled')
                             ->required(),
                         Forms\Components\Select::make('assigned_to')
+                            ->label('Assigned To')
                             ->relationship('assignedTo', 'first_name', function ($query) {
                                 return $query->select(['id', 'first_name', 'last_name'])
                                     ->selectRaw("CONCAT(first_name, ' ', last_name) as full_name");
                             })
                             ->getOptionLabelFromRecordUsing(fn (Member $record) => "{$record->first_name} {$record->last_name}")
                             ->searchable()
+                            ->preload()
+                            ->default(fn () => auth()->user()?->member?->id)
                             ->required(),
                     ])->columns(2),
                 

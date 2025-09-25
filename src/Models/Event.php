@@ -57,8 +57,9 @@ class Event extends ChurchModel
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        // Cast times in H:i:s format; stored as TIME in DB
+        'start_time' => 'datetime:H:i:s',
+        'end_time' => 'datetime:H:i:s',
         'registration_deadline' => 'datetime',
         'recurrence_days' => 'array',
         'metadata' => 'array',
