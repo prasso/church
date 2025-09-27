@@ -28,6 +28,8 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            });
+        }
 
         // Create indexes separately to handle existing tables
         if (Schema::hasTable('chm_locations')) {
@@ -43,7 +45,7 @@ return new class extends Migration
             }
         }
     }
-
+        
     /**
      * Reverse the migrations.
      */
