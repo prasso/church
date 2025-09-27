@@ -18,9 +18,8 @@ use Prasso\Church\Models\PrayerRequest;
 use Prasso\Church\Models\Skill;
 use Prasso\Church\Models\Transaction;
 use Prasso\Church\Models\VolunteerPosition;
-use Prasso\Messaging\Contracts\MemberContact;
 
-class Member extends ChurchModel implements MemberContact
+class Member extends ChurchModel
 {
     /**
      * The event map for the model.
