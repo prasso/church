@@ -187,7 +187,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     
     // Pastoral Care Module Routes
-    Route::prefix('pastoral-care')->group(function () {
+    Route::prefix('pastoral-care')->name('pastoral-care.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [PastoralCareController::class, 'dashboard']);
         
