@@ -28,7 +28,7 @@ class FilamentServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('church')
-            ->hasViews();
+            ->hasViews(__DIR__ . '/../Resources/views');
     }
 
     public function packageBooted(): void
