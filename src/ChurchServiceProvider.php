@@ -53,7 +53,7 @@ class ChurchServiceProvider extends ServiceProvider
         });
         
         // Load views
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'church');
+        $this->loadViewsFrom(__DIR__ . '/Resources/views', 'church');
         
         // Load migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
