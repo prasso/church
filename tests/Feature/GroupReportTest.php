@@ -5,11 +5,10 @@ namespace Prasso\Church\Tests\Feature;
 use Prasso\Church\Models\Group;
 use Prasso\Church\Models\Member;
 use Prasso\Church\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GroupReportTest extends TestCase
 {
-    use RefreshDatabase;
+   
 
     protected function setUp(): void
     {

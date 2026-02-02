@@ -6,11 +6,9 @@ use Prasso\Church\Models\Member;
 use Prasso\Church\Models\Group;
 use Prasso\Church\Models\PrayerRequest;
 use Prasso\Church\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PrayerRequestTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {

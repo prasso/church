@@ -7,12 +7,9 @@ use Prasso\Church\Models\VolunteerPosition;
 use Prasso\Church\Models\VolunteerAssignment;
 use Prasso\Church\Models\VolunteerHours;
 use Prasso\Church\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class VolunteerReportTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
