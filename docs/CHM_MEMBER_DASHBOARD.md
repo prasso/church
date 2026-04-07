@@ -141,15 +141,34 @@ The member dashboard is **in addition to** any admin functions the user may have
 - **Regular User:** Only sees member dashboard at `/member`
 - **User + Site Admin:** Sees both:
   - Member dashboard at `/member` (member-level access)
+  - Member dashboard widget in admin dashboard (integrated view)
   - Site admin panel at `/site-admin` (admin-level access)
 - **Super Admin:** Sees both:
   - Member dashboard at `/member` (if they have a Member record)
+  - Member dashboard widget in admin dashboard (integrated view)
   - Admin panel at `/admin` (full system access)
+
+### Admin Dashboard Integration
+
+Admin users who are also church members see a **Member Dashboard Widget** directly in their main dashboard at `/dashboard` (the default landing page after login):
+
+**Features:**
+- **Member Info Card:** Name, status, active roles, open opportunities
+- **Current Assignments:** Shows active volunteer assignments with status
+- **Available Opportunities:** Lists up to 5 open volunteer positions
+- **Quick Actions:** Sign up for volunteer roles directly from admin dashboard
+- **Full Dashboard Link:** Button to navigate to complete member dashboard
+
+**Smart Visibility:**
+- Only shows for users with both admin role AND member record
+- Hidden from regular admins without member profiles
+- Hidden from members without admin access
 
 **Navigation:** Users can navigate between roles via:
 - Logout and re-login with different role
 - Dashboard switcher (if implemented)
 - Direct URL access to appropriate role
+- Integrated widget in admin dashboard (for admin+members)
 
 ---
 
@@ -271,10 +290,14 @@ Potential additions to the member dashboard:
 ### New Files (CHM Package)
 - `packages/prasso/church/src/Livewire/MemberDashboard.php` - Livewire component
 - `packages/prasso/church/resources/views/livewire/member-dashboard.blade.php` - Blade view
+- `packages/prasso/church/src/Livewire/MemberDashboardWidget.php` - Dashboard widget component
+- `packages/prasso/church/resources/views/widgets/member-dashboard-widget.blade.php` - Widget view
+- `packages/prasso/church/resources/views/widgets/member-dashboard-widget-empty.blade.php` - Empty view
 
 ### Modified Files
 - `packages/prasso/church/routes/web.php` - Added `/member` route
 - `packages/prasso/church/src/ChurchServiceProvider.php` - Updated views path
+- `resources/views/components/dashboard.blade.php` - Added member dashboard widget
 
 ---
 

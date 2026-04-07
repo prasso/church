@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Prasso\Church\Providers\EventServiceProvider;
 use Prasso\Church\Filament\FilamentServiceProvider;
 use Prasso\Church\Providers\PastoralCareServiceProvider;
+use Livewire\Livewire;
 
 class ChurchServiceProvider extends ServiceProvider
 {
@@ -54,6 +55,9 @@ class ChurchServiceProvider extends ServiceProvider
         
         // Load views
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'church');
+        
+        // Register Livewire components
+        Livewire::component('prasso.church.member-dashboard-widget', \Prasso\Church\Livewire\MemberDashboardWidget::class);
         
         // Load migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
