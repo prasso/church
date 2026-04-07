@@ -122,6 +122,37 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Cleaning Signup Card -->
+                    <a href="{{ route('church.cleaning.signup.show') }}" class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-sm border border-blue-200 p-6 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-blue-900">Church Cleaning</h3>
+                            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
+                            </svg>
+                        </div>
+                        <p class="text-sm text-blue-800">Sign up to help keep our church clean and welcoming</p>
+                        <div class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                            Sign Up Now
+                        </div>
+                    </a>
+
+                    <!-- Volunteer Opportunities Card -->
+                    <button wire:click="$set('tab', 'volunteer')" class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm border border-green-200 p-6 hover:shadow-md transition-shadow text-left">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-green-900">Volunteer Opportunities</h3>
+                            <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12 1a1 1 0 011 1v6h6a1 1 0 110 2h-6v6a1 1 0 11-2 0v-6H5a1 1 0 110-2h6V2a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <p class="text-sm text-green-800">Explore available volunteer positions and sign up</p>
+                        <div class="mt-4 inline-block px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                            View Opportunities
+                        </div>
+                    </button>
+                </div>
             @endif
 
             <!-- Volunteer Opportunities Tab -->

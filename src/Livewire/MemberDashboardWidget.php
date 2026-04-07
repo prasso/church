@@ -29,7 +29,7 @@ class MemberDashboardWidget extends Component
             return;
         }
 
-        $this->member = Member::where('user_id', $user->id)->first();
+        $this->member = Member::where('email', $user->email)->first();
 
         if (!$this->member) {
             return;
@@ -155,12 +155,12 @@ class MemberDashboardWidget extends Component
     protected function isAdmin($user): bool
     {
         // Check if user has admin role (site admin or super admin)
-        return $user->hasRole('site_admin') || $user->hasRole('super_admin');
+        return $user->isSuperAdmin() || $user->isInstructor();
     }
 
     protected function isMember($user): bool
     {
-        return Member::where('user_id', $user->id)->exists();
+        return Member::where('email', $user->email)->exists();
     }
 
     public function shouldRender(): bool
@@ -175,11 +175,10 @@ class MemberDashboardWidget extends Component
             return view('livewire.empty-component');
         }
 
-        return view('church.widgets.member-dashboard-widget', [
+        return view('church::widgets.member-dashboard-widget', [
             'member' => $this->member,
             'myAssignments' => $this->myAssignments,
             'availablePositions' => $this->availablePositions,
-            'memberDashboardUrl' => route('church.member.dashboard'),
         ]);
     }
 }

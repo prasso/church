@@ -28,7 +28,20 @@ class MemberDashboard extends Component
             redirect('/login');
         }
 
+        // First, try to find by user_id (primary lookup)
         $this->member = Member::where('user_id', $user->id)->first();
+
+        // If not found by user_id, try to find by email and update the user_id
+        if (!$this->member) {
+            $this->member = Member::where('email', $user->email)
+                ->whereNull('user_id')
+                ->first();
+            
+            // If found by email with no user_id, update it
+            if ($this->member) {
+                $this->member->update(['user_id' => $user->id]);
+            }
+        }
 
         if (!$this->member) {
             // Member record doesn't exist yet
@@ -203,7 +216,7 @@ class MemberDashboard extends Component
 
     public function render()
     {
-        return view('livewire.member-dashboard', [
+        return view('church::livewire.member-dashboard', [
             'member' => $this->member,
             'availablePositions' => $this->availablePositions,
             'myAssignments' => $this->myAssignments,

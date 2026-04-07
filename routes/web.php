@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Prasso\Church\Livewire\MemberDashboard;
+use Prasso\Church\Http\Controllers\CleaningSignupController;
 
 
 
@@ -18,6 +19,14 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // Member Dashboard (CHM) - Available to all authenticated users who are members
     Route::get('/member', function () {
-        return app(MemberDashboard::class);
+        return view('church::member-dashboard');
     })->name('church.member.dashboard');
+
+    // Cleaning Signup Routes
+    Route::get('/cleaning-signup', [CleaningSignupController::class, 'show'])
+        ->name('church.cleaning.signup.show');
+    Route::post('/cleaning-signup', [CleaningSignupController::class, 'store'])
+        ->name('church.cleaning.signup.store');
+    Route::get('/cleaning-signup/schedule', [CleaningSignupController::class, 'getSchedule'])
+        ->name('church.cleaning.signup.schedule');
 });

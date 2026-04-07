@@ -57,6 +57,7 @@ class ChurchServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'church');
         
         // Register Livewire components
+        Livewire::component('member-dashboard', \Prasso\Church\Livewire\MemberDashboard::class);
         Livewire::component('prasso.church.member-dashboard-widget', \Prasso\Church\Livewire\MemberDashboardWidget::class);
         
         // Load migrations

@@ -1,11 +1,6 @@
-@if ($this->shouldRender())
-    @php
-        $data = $this->getData();
-        $member = $data['member'] ?? null;
-        $myAssignments = $data['myAssignments'] ?? [];
-        $availablePositions = $data['availablePositions'] ?? [];
-        $memberDashboardUrl = $data['memberDashboardUrl'] ?? '#';
-    @endphp
+@php
+    $memberDashboardUrl = route('church.member.dashboard');
+@endphp
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <!-- Header -->
@@ -106,7 +101,7 @@
                                                 <span>Spots: {{ $position['current_volunteers'] }}/{{ $position['max_volunteers'] }}</span>
                                             @endif
                                         </div>
-                                        <button wire:click="signUpForPosition({{ $position['id'] }})"
+                                        <button type="button" wire:click="signUpForPosition({{ $position['id'] }})"
                                                 class="text-sm text-blue-600 hover:text-blue-800 font-medium">
                                             Sign Up
                                         </button>
@@ -141,4 +136,3 @@
             </div>
         @endif
     </div>
-@endif
