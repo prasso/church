@@ -21,8 +21,10 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/member', function () {
         return view('church::member-dashboard');
     })->name('church.member.dashboard');
+});
 
-    // Cleaning Signup Routes
+// Cleaning Signup Routes - Available to both authenticated and unauthenticated users
+Route::middleware(['web'])->group(function () {
     Route::get('/cleaning-signup', [CleaningSignupController::class, 'show'])
         ->name('church.cleaning.signup.show');
     Route::post('/cleaning-signup', [CleaningSignupController::class, 'store'])

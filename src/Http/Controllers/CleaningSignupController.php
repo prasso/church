@@ -25,8 +25,22 @@ class CleaningSignupController extends Controller
             ]);
         }
 
+        // Get user data if authenticated
+        $user = auth()->user();
+        $userData = null;
+        
+        if ($user) {
+            $userData = [
+                'name' => $user->name ?? '',
+                'phone' => $user->phone ?? '',
+                'email' => $user->email ?? '',
+            ];
+        }
+
         return view('church::cleaning-signup', [
             'position' => $position,
+            'userData' => $userData,
+            'isAuthenticated' => (bool) $user,
         ]);
     }
 

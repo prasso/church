@@ -142,6 +142,15 @@
                             <p class="text-xs text-gray-500 mt-1">We'll send text reminders to this number</p>
                         </div>
 
+                        @if($isAuthenticated)
+                        <!-- Authentication Status -->
+                        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-xs text-green-900">
+                                <strong>Logged in:</strong> Your information has been prefilled.
+                            </p>
+                        </div>
+                        @endif
+
                         <!-- Info Box -->
                         <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p class="text-xs text-blue-900">
@@ -177,8 +186,8 @@
     function cleaningSignup() {
         return {
             form: {
-                name: '',
-                phone: ''
+                name: '{{ $userData['name'] ?? '' }}',
+                phone: '{{ $userData['phone'] ?? '' }}'
             },
             selectedWeekIndex: null,
             dataKey: '',
