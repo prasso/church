@@ -57,7 +57,7 @@
                         <template x-for="(week, index) in weeks" :key="index">
                             <button
                                 @click="selectWeek(index)"
-                                :disabled="week.taken || !isFormValid()"
+                                :disabled="week.taken"
                                 :class="{
                                     'bg-blue-50 border-2 border-blue-500 cursor-pointer': selectedWeekIndex === index,
                                     'bg-gray-50 border-2 border-gray-300 hover:border-blue-300 cursor-pointer': selectedWeekIndex !== index && !week.taken,
@@ -124,23 +124,83 @@
                             >
                         </div>
 
-                        <!-- Phone Field -->
+                        <!-- Reminder Preference -->
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
-                                Phone Number <span class="text-red-500">*</span>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                Reminder Preference <span class="text-red-500">*</span>
                             </label>
-                            <input
-                                type="tel"
-                                id="phone"
-                                name="phone"
-                                x-model="form.phone"
-                                required
-                                placeholder="(555) 123-4567"
-                                pattern="[0-9\-\+\(\)\s]+"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                            <p class="text-xs text-gray-500 mt-1">We'll send text reminders to this number</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="reminder_type"
+                                        value="sms"
+                                        x-model="form.reminderType"
+                                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    >
+                                    <span class="ml-3 text-sm text-gray-700">SMS Text Message</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="reminder_type"
+                                        value="email"
+                                        x-model="form.reminderType"
+                                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    >
+                                    <span class="ml-3 text-sm text-gray-700">Email</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="reminder_type"
+                                        value="both"
+                                        x-model="form.reminderType"
+                                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    >
+                                    <span class="ml-3 text-sm text-gray-700">Both SMS and Email</span>
+                                </label>
+                            </div>
                         </div>
+
+                        <!-- Phone Field (conditional) -->
+                        <template x-if="['sms', 'both'].includes(form.reminderType)">
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    x-model="form.phone"
+                                    required
+                                    placeholder="(555) 123-4567"
+                                    pattern="[0-9\-\+\(\)\s]+"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Required for SMS reminders</p>
+                            </div>
+                        </template>
+
+                        <!-- Email Field (conditional) -->
+                        <template x-if="['email', 'both'].includes(form.reminderType)">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    x-model="form.email"
+                                    required
+                                    placeholder="john@example.com"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Required for email reminders</p>
+                            </div>
+                        </template>
 
                         @if($isAuthenticated)
                         <!-- Authentication Status -->
@@ -154,7 +214,7 @@
                         <!-- Info Box -->
                         <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p class="text-xs text-blue-900">
-                                <strong>Note:</strong> You will receive SMS text message reminders for your assigned week.
+                                <strong>Note:</strong> You will receive reminders for your assigned week via your selected method.
                             </p>
                         </div>
 
@@ -187,55 +247,37 @@
         return {
             form: {
                 name: '{{ $userData['name'] ?? '' }}',
-                phone: '{{ $userData['phone'] ?? '' }}'
+                phone: '{{ $userData['phone'] ?? '' }}',
+                email: '{{ $userData['email'] ?? '' }}',
+                reminderType: 'sms'
             },
             selectedWeekIndex: null,
             dataKey: '',
             isSubmitting: false,
             successMessage: '',
             errorMessage: '',
-            weeks: [
-                {
-                    weekNumber: 1,
-                    label: 'Week 1',
-                    dateRange: 'Jan 5 - Jan 11',
-                    taken: false
-                },
-                {
-                    weekNumber: 2,
-                    label: 'Week 2',
-                    dateRange: 'Jan 12 - Jan 18',
-                    taken: false
-                },
-                {
-                    weekNumber: 3,
-                    label: 'Week 3',
-                    dateRange: 'Jan 19 - Jan 25',
-                    taken: false
-                },
-                {
-                    weekNumber: 4,
-                    label: 'Week 4',
-                    dateRange: 'Jan 26 - Feb 1',
-                    taken: false
-                },
-                {
-                    weekNumber: 5,
-                    label: 'Week 5',
-                    dateRange: 'Feb 2 - Feb 8',
-                    taken: false
-                },
-                {
-                    weekNumber: 6,
-                    label: 'Week 6',
-                    dateRange: 'Feb 9 - Feb 15',
-                    taken: false
-                }
-            ],
+            weeks: [],
 
             init() {
-                this.loadScheduleData();
                 this.dataKey = this.generateDataKey();
+                // Load schedule data and wait for it to complete
+                this.loadScheduleData().then(() => {
+                    console.log('Schedule data loaded successfully');
+                });
+                
+                // Preserve week selection when form changes
+                this.$watch('form.reminderType', () => {
+                    // Week selection is preserved - no action needed
+                });
+                this.$watch('form.name', () => {
+                    // Week selection is preserved - no action needed
+                });
+                this.$watch('form.phone', () => {
+                    // Week selection is preserved - no action needed
+                });
+                this.$watch('form.email', () => {
+                    // Week selection is preserved - no action needed
+                });
             },
 
             async loadScheduleData() {
@@ -244,15 +286,80 @@
                     if (!response.ok) throw new Error('Failed to load schedule');
                     
                     const data = await response.json();
-                    // Update weeks with taken status from server
-                    data.forEach((item, index) => {
-                        if (this.weeks[index]) {
-                            this.weeks[index].taken = item.taken;
-                        }
-                    });
+                    
+                    // Generate weeks starting from today forward
+                    const today = new Date();
+                    const currentWeekOfYear = this.getWeekNumber(today);
+                    
+                    // Show next 12 weeks from today
+                    const weeksToShow = 12;
+                    const newWeeks = [];
+                    
+                    for (let i = 0; i < weeksToShow; i++) {
+                        const weekNum = currentWeekOfYear + i;
+                        const weekData = data[weekNum - 1] || { taken: false, count: 0, maxVolunteers: 1 };
+                        
+                        // Calculate date range for this week
+                        const weekStart = this.getDateOfWeek(today.getFullYear(), weekNum);
+                        const weekEnd = new Date(weekStart);
+                        weekEnd.setDate(weekEnd.getDate() + 6);
+                        
+                        const dateRange = this.formatDateRange(weekStart, weekEnd);
+                        
+                        newWeeks.push({
+                            weekNumber: weekNum,
+                            label: `Week ${weekNum}`,
+                            dateRange: dateRange,
+                            taken: weekData.taken,
+                            count: weekData.count,
+                            maxVolunteers: weekData.maxVolunteers
+                        });
+                    }
+                    
+                    // Store current selection before updating
+                    const currentSelection = this.selectedWeekIndex;
+                    
+                    // Update weeks
+                    this.weeks = newWeeks;
+                    
+                    // Restore selection after update
+                    this.selectedWeekIndex = currentSelection;
                 } catch (error) {
                     console.error('Error loading schedule:', error);
-                    // Continue with default schedule if load fails
+                    // Continue with empty schedule if load fails
+                }
+            },
+            
+            getWeekNumber(date) {
+                const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                const dayNum = d.getUTCDay() || 7;
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            },
+            
+            getDateOfWeek(year, week) {
+                const simple = new Date(year, 0, 1 + (week - 1) * 7);
+                const dow = simple.getDay();
+                const ISOweekStart = simple;
+                if (dow <= 4)
+                    ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+                else
+                    ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+                return ISOweekStart;
+            },
+            
+            formatDateRange(start, end) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const startMonth = monthNames[start.getMonth()];
+                const endMonth = monthNames[end.getMonth()];
+                const startDay = start.getDate();
+                const endDay = end.getDate();
+                
+                if (startMonth === endMonth) {
+                    return `${startMonth} ${startDay} - ${endDay}`;
+                } else {
+                    return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
                 }
             },
 
@@ -261,15 +368,32 @@
             },
 
             selectWeek(index) {
-                if (!this.weeks[index].taken && this.isFormValid()) {
+                if (!this.weeks[index].taken) {
                     this.selectedWeekIndex = this.selectedWeekIndex === index ? null : index;
                 }
             },
 
             isFormValid() {
-                return this.form.name.trim() !== '' && 
-                       this.form.phone.trim() !== '' && 
-                       this.selectedWeekIndex !== null;
+                // Name, reminder type, and week are always required
+                if (this.form.name.trim() === '' || this.form.reminderType === '' || this.selectedWeekIndex === null) {
+                    return false;
+                }
+
+                // Phone is required only if SMS or both is selected
+                if (['sms', 'both'].includes(this.form.reminderType)) {
+                    if (this.form.phone.trim() === '') {
+                        return false;
+                    }
+                }
+
+                // Email is required only if email or both is selected
+                if (['email', 'both'].includes(this.form.reminderType)) {
+                    if (this.form.email.trim() === '') {
+                        return false;
+                    }
+                }
+
+                return true;
             },
 
             async submitForm() {
@@ -289,6 +413,8 @@
                     formData.append('data_key', this.dataKey);
                     formData.append('name', this.form.name);
                     formData.append('phone', this.form.phone);
+                    formData.append('email', this.form.email);
+                    formData.append('reminder_type', this.form.reminderType);
                     formData.append('selected_week', this.weeks[this.selectedWeekIndex].weekNumber);
                     formData.append('return_json', 'true');
 
@@ -306,15 +432,25 @@
 
                     const data = await response.json();
 
-                    // Mark the week as taken
-                    this.weeks[this.selectedWeekIndex].taken = true;
+                    // Refresh schedule data to get accurate availability
+                    await this.loadScheduleData();
 
-                    // Show success message
-                    this.successMessage = `Success! You've signed up for ${this.weeks[this.selectedWeekIndex].label}. You'll receive SMS reminders at ${this.form.phone}.`;
+                    // Show success message based on reminder type
+                    let reminderMsg = '';
+                    if (this.form.reminderType === 'sms') {
+                        reminderMsg = `You'll receive SMS reminders at ${this.form.phone}.`;
+                    } else if (this.form.reminderType === 'email') {
+                        reminderMsg = `You'll receive email reminders at ${this.form.email}.`;
+                    } else {
+                        reminderMsg = `You'll receive SMS reminders at ${this.form.phone} and email reminders at ${this.form.email}.`;
+                    }
+                    this.successMessage = `Success! You've signed up for ${this.weeks[this.selectedWeekIndex].label}. ${reminderMsg}`;
 
                     // Reset form
                     this.form.name = '';
                     this.form.phone = '';
+                    this.form.email = '';
+                    this.form.reminderType = 'sms';
                     this.selectedWeekIndex = null;
                     this.dataKey = this.generateDataKey();
 
