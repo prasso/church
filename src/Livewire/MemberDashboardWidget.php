@@ -14,9 +14,11 @@ class MemberDashboardWidget extends Component
     public $member;
     public $myAssignments = [];
     public $availablePositions = [];
+    public $siteId;
 
-    public function mount()
+    public function mount($siteId = null)
     {
+        $this->siteId = $siteId;
         $this->loadData();
     }
 
@@ -24,8 +26,8 @@ class MemberDashboardWidget extends Component
     {
         $user = Auth::user();
         
-        // Only show if user is an admin and also a member
-        if (!$user || !$this->isAdmin($user) || !$this->isMember($user)) {
+        // Only show if user is an admin and also a member of the current site
+        if (!$user || !$this->isAdmin($user) || !$this->isMemberOfSite($user)) {
             return;
         }
 
@@ -163,10 +165,23 @@ class MemberDashboardWidget extends Component
         return Member::where('email', $user->email)->exists();
     }
 
+    protected function isMemberOfSite($user): bool
+    {
+        // If no siteId provided, cannot verify membership
+        if (!$this->siteId) {
+            return false;
+        }
+
+        // Check if user has a member record associated with this site
+        return Member::where('user_id', $user->id)
+            ->where('site_id', $this->siteId)
+            ->exists();
+    }
+
     public function shouldRender(): bool
     {
         $user = Auth::user();
-        return $user && $this->isAdmin($user) && $this->isMember($user);
+        return $user && $this->isAdmin($user) && $this->isMemberOfSite($user);
     }
 
     public function render()

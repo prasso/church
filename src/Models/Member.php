@@ -58,6 +58,7 @@ class Member extends ChurchModel
         'family_id',
         'is_head_of_household',
         'user_id',
+        'site_id',
     ];
 
     /**
@@ -157,6 +158,14 @@ class Member extends ChurchModel
     public function user(): BelongsTo
     {
         return $this->belongsTo(config('auth.providers.users.model'));
+    }
+
+    /**
+     * Get the site that owns the member.
+     */
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Site::class);
     }
 
     /**
