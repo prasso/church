@@ -195,6 +195,12 @@
                                     >
                                         Sign Up
                                     </button>
+                                    @if ($position['title'] === 'Clean the Church')
+                                        <a href="{{ route('church.cleaning.signup.report') }}"
+                                           class="mt-3 inline-flex items-center justify-center w-full text-sm font-medium text-slate-600 hover:text-slate-800">
+                                            View cleaning schedule
+                                        </a>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

@@ -221,6 +221,53 @@ class CleaningSignupController extends Controller
     }
 
     /**
+     * Display the current list of cleaners and their assigned weeks.
+     */
+    public function report()
+    {
+        $position = VolunteerPosition::where('title', 'Clean the Church')->first();
+
+        if (!$position) {
+            return view('church::cleaning-report', [
+                'error' => 'The cleaning volunteer position is not available. Please contact the church office.'
+            ]);
+        }
+
+        $assignments = VolunteerAssignment::where('position_id', $position->id)
+            ->whereIn('status', ['pending', 'active'])
+            ->with('member')
+            ->orderBy('start_date')
+            ->get()
+            ->map(function ($assignment) {
+                $startDate = $assignment->start_date;
+                $weekNumber = $assignment->metadata['preferred_week'] ?? null;
+                if (!$weekNumber && $startDate) {
+                    $weekNumber = (int) $startDate->format('W');
+                }
+
+                $weekRange = null;
+                if ($startDate) {
+                    $weekRange = $startDate->format('M j') . ' - ' . $startDate->copy()->addDays(6)->format('M j, Y');
+                }
+
+                return [
+                    'member_name' => $assignment->member?->full_name
+                        ?: ($assignment->metadata['signup_name'] ?? 'Unknown'),
+                    'week_number' => $weekNumber,
+                    'week_range' => $weekRange,
+                    'status' => $assignment->status,
+                    'notes' => $assignment->notes,
+                ];
+            })
+            ->toArray();
+
+        return view('church::cleaning-report', [
+            'position' => $position,
+            'assignments' => $assignments,
+        ]);
+    }
+
+    /**
      * Send reminder notifications based on user preference.
      */
     private function sendReminders(VolunteerAssignment $assignment, Member $member, array $validated, ?\App\Models\Site $site = null)

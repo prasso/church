@@ -120,6 +120,7 @@ class MemberDashboard extends Component
                 ];
             })
             ->toArray();
+
     }
 
     public function signUpForPosition($positionId)

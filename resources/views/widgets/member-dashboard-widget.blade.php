@@ -78,7 +78,12 @@
 
                 <!-- Available Opportunities -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Available Opportunities</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Available Opportunities</h3>
+                        <a href="{{ route('church.cleaning.signup.report') }}" class="text-sm font-medium text-slate-600 hover:text-slate-800">
+                            View cleaning schedule
+                        </a>
+                    </div>
                     @if (count($availablePositions) > 0)
                         <div class="space-y-3">
                             @foreach ($availablePositions as $position)
