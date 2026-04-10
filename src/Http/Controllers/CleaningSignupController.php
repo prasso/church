@@ -10,7 +10,6 @@ use Prasso\Church\Models\VolunteerAssignment;
 use Prasso\Church\Models\Member;
 use Prasso\Messaging\Models\MsgMessage;
 use Prasso\Messaging\Models\MsgDelivery;
-use Prasso\Messaging\Models\MsgGuest;
 
 class CleaningSignupController extends Controller
 {
@@ -95,16 +94,16 @@ class CleaningSignupController extends Controller
                 return redirect()->back()->with('error', 'The cleaning volunteer position is no longer available.');
             }
 
-            // Determine member_id: use authenticated user's member record if available
-            $memberId = null;
-            $signupType = 'guest';
-            if (auth()->check()) {
-                $member = Member::where('user_id', auth()->id())->first();
-                if ($member) {
-                    $memberId = $member->id;
-                    $signupType = 'member';
-                }
-            }
+            $site = $this->getSiteFromRequest();
+            $member = $this->getOrCreateMember(
+                $validated['name'],
+                $validated['phone'] ?? null,
+                $validated['email'] ?? null,
+                $site?->id,
+                auth()->user()?->id
+            );
+            $memberId = $member->id;
+            $signupType = auth()->check() ? 'member' : 'public';
 
             // Calculate start date from selected week number
             $weekNumber = $validated['selected_week'];
@@ -120,9 +119,9 @@ class CleaningSignupController extends Controller
                     'status' => 'pending', // Requires admin approval
                     'notes' => "{$signupType} signup via cleaning form",
                     'metadata' => [
-                        'guest_name' => $validated['name'],
-                        'guest_phone' => $validated['phone'],
-                        'guest_email' => $validated['email'],
+                        'signup_name' => $validated['name'],
+                        'signup_phone' => $validated['phone'] ?? null,
+                        'signup_email' => $validated['email'] ?? null,
                         'reminder_type' => $validated['reminder_type'],
                         'preferred_week' => $validated['selected_week'],
                         'data_key' => $validated['data_key'],
@@ -133,13 +132,30 @@ class CleaningSignupController extends Controller
                 ]);
             });
 
-            $this->sendReminders($assignment, $validated);
+            $this->sendReminders($assignment, $member, $validated, $site);
 
             if ($request->expectsJson() || $request->input('return_json')) {
+                $registrationMode = null;
+                $registrationUrl = null;
+                if (!auth()->check() && !$member->user_id) {
+                    $registrationMode = $site?->invitation_only ? 'invitation' : 'register';
+                    $registrationUrl = $registrationMode === 'invitation'
+                        ? route('invitation-request.show', [
+                            'name' => $validated['name'],
+                            'email' => $validated['email'] ?? null,
+                        ])
+                        : route('register', [
+                            'name' => $validated['name'],
+                            'email' => $validated['email'] ?? null,
+                        ]);
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Thank you for signing up for church cleaning!',
                     'assignment_id' => $assignment->id,
+                    'registration_url' => $registrationUrl,
+                    'registration_mode' => $registrationMode,
                 ], 201);
             }
 
@@ -207,36 +223,29 @@ class CleaningSignupController extends Controller
     /**
      * Send reminder notifications based on user preference.
      */
-    private function sendReminders(VolunteerAssignment $assignment, array $validated)
+    private function sendReminders(VolunteerAssignment $assignment, Member $member, array $validated, ?\App\Models\Site $site = null)
     {
         $reminderType = $validated['reminder_type'];
-        $guestName = $validated['name'];
-        $guestPhone = $validated['phone'];
-        $guestEmail = $validated['email'];
+        $memberName = $member->getMemberDisplayName() ?? $validated['name'];
+        $memberPhone = $validated['phone'] ?? $member->phone;
+        $memberEmail = $validated['email'] ?? $member->email;
         $week = $validated['selected_week'];
 
         try {
-            // Get the site from the request
-            $site = $this->getSiteFromRequest();
+            $site = $site ?? $this->getSiteFromRequest();
             if (!$site) {
                 Log::warning('Could not determine site for reminders');
                 return;
             }
 
-            // Get authenticated user ID if available
-            $userId = auth()->check() ? auth()->id() : null;
-
-            // Create or get guest record for tracking
-            $guest = $this->getOrCreateGuest($guestName, $guestPhone, $guestEmail, $site->id, $userId);
-
             // Send SMS reminder if requested
-            if (in_array($reminderType, ['sms', 'both'])) {
-                $this->sendSmsReminder($guestPhone, $guestName, $week, $guest, $site);
+            if (in_array($reminderType, ['sms', 'both']) && $memberPhone) {
+                $this->sendSmsReminder($memberPhone, $memberName, $week, $member, $site);
             }
 
             // Send email reminder if requested
-            if (in_array($reminderType, ['email', 'both'])) {
-                $this->sendEmailReminder($guestEmail, $guestName, $week, $guest, $site);
+            if (in_array($reminderType, ['email', 'both']) && $memberEmail) {
+                $this->sendEmailReminder($memberEmail, $memberName, $week, $member, $site);
             }
         } catch (\Exception $e) {
             Log::warning('Failed to send reminders for cleaning signup: ' . $e->getMessage());
@@ -246,8 +255,12 @@ class CleaningSignupController extends Controller
     /**
      * Send SMS reminder via Prasso Messaging.
      */
-    private function sendSmsReminder(string $phone, string $name, int $week, MsgGuest $guest, $site)
+    private function sendSmsReminder(?string $phone, string $name, int $week, Member $member, $site)
     {
+        if (!$phone) {
+            Log::warning('SMS reminder skipped: missing phone number.');
+            return;
+        }
         try {
             // Get the week start date and format it nicely
             $weekStartDate = $this->getDateOfWeek(now()->year, $week);
@@ -271,8 +284,8 @@ class CleaningSignupController extends Controller
             $delivery = MsgDelivery::create([
                 'team_id' => $teamId,
                 'msg_message_id' => $msgRecord->id,
-                'recipient_type' => 'guest',
-                'recipient_id' => $guest->id,
+                'recipient_type' => 'member',
+                'recipient_id' => $member->id,
                 'channel' => 'sms',
                 'status' => 'queued',
                 'metadata' => [
@@ -290,8 +303,12 @@ class CleaningSignupController extends Controller
     /**
      * Send email reminder.
      */
-    private function sendEmailReminder(string $email, string $name, int $week, MsgGuest $guest, $site)
+    private function sendEmailReminder(?string $email, string $name, int $week, Member $member, $site)
     {
+        if (!$email) {
+            Log::warning('Email reminder skipped: missing email address.');
+            return;
+        }
         try {
             // Get the week start date and format it nicely
             $weekStartDate = $this->getDateOfWeek(now()->year, $week);
@@ -315,8 +332,8 @@ class CleaningSignupController extends Controller
             $delivery = MsgDelivery::create([
                 'team_id' => $teamId,
                 'msg_message_id' => $msgRecord->id,
-                'recipient_type' => 'guest',
-                'recipient_id' => $guest->id,
+                'recipient_type' => 'member',
+                'recipient_id' => $member->id,
                 'channel' => 'email',
                 'status' => 'queued',
                 'metadata' => [
@@ -352,31 +369,76 @@ class CleaningSignupController extends Controller
     }
 
     /**
-     * Get or create a guest record for message tracking.
+     * Get or create a member record for message tracking.
      */
-    private function getOrCreateGuest(string $name, string $phone, string $email, int $siteId, ?int $userId = null): MsgGuest
+    private function getOrCreateMember(string $name, ?string $phone, ?string $email, ?int $siteId, ?int $userId = null): Member
     {
-        // Try to find existing guest by email
-        $guest = MsgGuest::where('email', $email)->first();
+        $member = null;
 
-        if ($guest) {
-            // Update with latest info if needed
-            $guest->update([
-                'name' => $name,
-                'phone' => $phone,
-                'user_id' => $userId, // Update user_id if authenticated
-            ]);
-            return $guest;
+        if ($userId) {
+            $member = Member::where('user_id', $userId)->first();
         }
 
-        // Create new guest record
-        return MsgGuest::create([
-            'user_id' => $userId, // Use authenticated user ID if available
-            'name' => $name,
-            'phone' => $phone,
+        if (!$member && ($email || $phone)) {
+            $memberQuery = Member::query();
+            if ($siteId) {
+                $memberQuery->where('site_id', $siteId);
+            }
+            $memberQuery->where(function ($query) use ($email, $phone) {
+                if ($email) {
+                    $query->orWhere('email', $email);
+                }
+                if ($phone) {
+                    $query->orWhere('phone', $phone);
+                }
+            });
+
+            $member = $memberQuery->first();
+        }
+
+        [$firstName, $middleName, $lastName] = $this->splitName($name);
+
+        if ($member) {
+            $member->fill([
+                'first_name' => $firstName,
+                'middle_name' => $middleName,
+                'last_name' => $lastName,
+                'email' => $email ?? $member->email,
+                'phone' => $phone ?? $member->phone,
+                'user_id' => $userId ?? $member->user_id,
+                'site_id' => $siteId ?? $member->site_id,
+            ]);
+            $member->save();
+            return $member;
+        }
+
+        return Member::create([
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
             'email' => $email,
-            'is_subscribed' => true,
+            'phone' => $phone,
+            'user_id' => $userId,
+            'site_id' => $siteId,
         ]);
+    }
+
+    /**
+     * Split a full name into first, middle, and last parts.
+     */
+    private function splitName(string $name): array
+    {
+        $parts = preg_split('/\s+/', trim($name)) ?: [];
+
+        if (empty($parts)) {
+            return ['', null, ''];
+        }
+
+        $firstName = array_shift($parts);
+        $lastName = count($parts) ? array_pop($parts) : '';
+        $middleName = count($parts) ? implode(' ', $parts) : null;
+
+        return [$firstName, $middleName, $lastName];
     }
 
     /**

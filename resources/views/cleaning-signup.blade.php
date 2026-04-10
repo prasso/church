@@ -38,6 +38,25 @@
             </div>
         </template>
 
+        <template x-if="registrationUrl">
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-blue-900 text-sm">
+                    <template x-if="registrationMode === 'invitation'">
+                        <span>This site is invitation-only. Request an invitation to manage your volunteer schedule online.</span>
+                    </template>
+                    <template x-if="registrationMode !== 'invitation'">
+                        <span>Want to manage your volunteer schedule online? Complete your registration to create your member account.</span>
+                    </template>
+                </p>
+                <a
+                    :href="registrationUrl"
+                    class="mt-3 inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900"
+                >
+                    <span x-text="registrationMode === 'invitation' ? 'Request invitation →' : 'Finish registration →'"></span>
+                </a>
+            </div>
+        </template>
+
         <template x-if="errorMessage">
             <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p class="text-red-800" x-text="errorMessage"></p>
@@ -256,6 +275,8 @@
             isSubmitting: false,
             successMessage: '',
             errorMessage: '',
+            registrationUrl: '',
+            registrationMode: '',
             weeks: [],
 
             init() {
@@ -445,6 +466,8 @@
                         reminderMsg = `You'll receive SMS reminders at ${this.form.phone} and email reminders at ${this.form.email}.`;
                     }
                     this.successMessage = `Success! You've signed up for ${this.weeks[this.selectedWeekIndex].label}. ${reminderMsg}`;
+                    this.registrationUrl = data.registration_url || '';
+                    this.registrationMode = data.registration_mode || '';
 
                     // Reset form
                     this.form.name = '';
@@ -453,6 +476,10 @@
                     this.form.reminderType = 'sms';
                     this.selectedWeekIndex = null;
                     this.dataKey = this.generateDataKey();
+                    if (!this.registrationUrl) {
+                        this.registrationUrl = '';
+                        this.registrationMode = '';
+                    }
 
                     // Clear success message after 5 seconds
                     setTimeout(() => {
