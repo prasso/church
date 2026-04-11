@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Prasso\Church\Livewire\MemberDashboard;
 use Prasso\Church\Http\Controllers\CleaningSignupController;
+use Prasso\Church\Livewire\CleaningChecklist;
 
 
 
@@ -24,6 +25,9 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/cleaning-signup/report', [CleaningSignupController::class, 'report'])
         ->name('church.cleaning.signup.report');
+
+    Route::get('/cleaning-checklist', [CleaningSignupController::class, 'checklist'])
+        ->name('church.cleaning.checklist');
 });
 
 // Cleaning Signup Routes - Available to both authenticated and unauthenticated users

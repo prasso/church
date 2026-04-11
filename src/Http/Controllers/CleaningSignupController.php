@@ -2,6 +2,7 @@
 
 namespace Prasso\Church\Http\Controllers;
 
+use App\Http\Controllers\Controller as AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,9 +22,29 @@ class CleaningSignupController extends Controller
         // Get or create the "Clean the Church" volunteer position
         $position = VolunteerPosition::where('title', 'Clean the Church')->first();
         
+        $site = AppController::getClientFromHost();
+        $masterPage = AppController::getMasterForSite($site);
+        
+        // Get the masterpage template name from site or use default
+        $masterpageTemplate = $this->getMasterpageTemplate($site, $masterPage);
+        
         if (!$position) {
-            return view('church::cleaning-signup', [
-                'error' => 'The cleaning volunteer position is not available. Please contact the church office.'
+            $sitePage = $this->buildSitePage(
+                $site,
+                $masterpageTemplate,
+                'Cleaning Signup',
+                'cleaning-signup',
+                view('church::cleaning-signup', [
+                    'error' => 'The cleaning volunteer position is not available. Please contact the church office.',
+                    'site' => $site,
+                ])->render()
+            );
+
+            return view($masterpageTemplate, [
+                'sitePage' => $sitePage,
+                'site' => $site,
+                'page_short_url' => '/cleaning-signup',
+                'masterPage' => $masterPage,
             ]);
         }
 
@@ -39,11 +60,63 @@ class CleaningSignupController extends Controller
             ];
         }
 
-        return view('church::cleaning-signup', [
-            'position' => $position,
-            'userData' => $userData,
-            'isAuthenticated' => (bool) $user,
+        $sitePage = $this->buildSitePage(
+            $site,
+            $masterpageTemplate,
+            'Cleaning Signup',
+            'cleaning-signup',
+            view('church::cleaning-signup', [
+                'position' => $position,
+                'userData' => $userData,
+                'isAuthenticated' => (bool) $user,
+                'site' => $site,
+            ])->render()
+        );
+
+        return view($masterpageTemplate, [
+            'sitePage' => $sitePage,
+            'site' => $site,
+            'page_short_url' => '/cleaning-signup',
+            'masterPage' => $masterPage,
         ]);
+    }
+
+    /**
+     * Get the masterpage template name for the site
+     */
+    private function getMasterpageTemplate($site, $masterPage)
+    {
+        if ($site && !empty($site->default_masterpage)) {
+            return $site->default_masterpage;
+        }
+
+        // If we have a masterPage object, get the template name from it
+        if ($masterPage && isset($masterPage->pagename)) {
+            return $masterPage->pagename;
+        }
+        
+        // Otherwise, try to get from site's SitePages
+        if ($site) {
+            $sitePage = \App\Models\SitePages::where('fk_site_id', $site->id)->first();
+            if ($sitePage && isset($sitePage->masterpage)) {
+                return $sitePage->masterpage;
+            }
+        }
+        
+        // Fallback to default masterpage
+        return 'sitepage.templates.blankpage';
+    }
+
+    private function buildSitePage($site, string $masterpageTemplate, string $title, string $section, string $content)
+    {
+        $sitePage = new \App\Models\SitePages();
+        $sitePage->fk_site_id = $site?->id;
+        $sitePage->title = $title;
+        $sitePage->section = $section;
+        $sitePage->description = $content;
+        $sitePage->masterpage = $masterpageTemplate;
+
+        return $sitePage;
     }
 
     /**
@@ -264,6 +337,68 @@ class CleaningSignupController extends Controller
         return view('church::cleaning-report', [
             'position' => $position,
             'assignments' => $assignments,
+        ]);
+    }
+
+    /**
+     * Display the cleaning checklist.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function checklist()
+    {
+        $regularTasks = [
+            "Vacuum auditorium carpet",
+            "Vacuum nursery carpet", 
+            "Vacuum runners in foyer",
+            "Vacuum blue classroom",
+            "Sweep and mop fellowship room",
+            "Sweep and mop foyer and bathrooms",
+            "Sweep and mop back door hallway",
+            "Sweep and mop auditorium platform",
+            "Sweep children's classroom",
+            "Clean toilets in all four bathrooms",
+            "Clean sinks in all four bathrooms",
+            "Clean mirrors in bathrooms",
+            "Sanitize baby changing table with Lysol spray",
+            "Clean four glass doors and the nursery door",
+            "Collect and empty trash in children's classroom",
+            "Collect and empty trash from all four bathrooms",
+            "Spray and wipe down tables and countertops",
+            "Clean trash off of tables and pews",
+        ];
+
+        $extraTasks = [
+            "Sweep front porch and sidewalks if needed",
+            "Vacuum pew seats",
+            "Dust furniture",
+            "Dust window sills", 
+            "Clean glass in front of baptistry",
+        ];
+
+        $site = AppController::getClientFromHost();
+        $masterPage = AppController::getMasterForSite($site);
+        
+        // Get the masterpage template name from site or use default
+        $masterpageTemplate = $this->getMasterpageTemplate($site, $masterPage);
+        
+        $sitePage = $this->buildSitePage(
+            $site,
+            $masterpageTemplate,
+            'Cleaning Checklist',
+            'cleaning-checklist',
+            view('church::cleaning-checklist', [
+                'regularTasks' => $regularTasks,
+                'extraTasks' => $extraTasks,
+                'site' => $site,
+            ])->render()
+        );
+
+        return view($masterpageTemplate, [
+            'sitePage' => $sitePage,
+            'site' => $site,
+            'page_short_url' => '/cleaning-checklist',
+            'masterPage' => $masterPage,
         ]);
     }
 

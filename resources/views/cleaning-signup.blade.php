@@ -1,16 +1,4 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Church Cleaning Signup</title>
-    <link href="/js/google-fonts-inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-</head>
-<body class="font-sans antialiased bg-gray-100">
+<div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
 @if (isset($error))
     <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
@@ -27,8 +15,23 @@
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Church Cleaning Signup</h1>
-            <p class="text-lg text-gray-600">Sign up to help keep our church clean and welcoming</p>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-4">
+                    
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900 mb-2">Church Cleaning Signup</h1>
+                        <p class="text-lg text-gray-600">Sign up to help keep our church clean and welcoming</p>
+                    </div>
+                </div>
+                <a href="{{ route('church.cleaning.checklist') }}" 
+                   target="_blank" 
+                   class="teambutton inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 shadow-md transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    Cleaning Checklist
+                </a>
+            </div>
         </div>
 
         <!-- Alert Messages -->
@@ -496,6 +499,7 @@
         };
     }
 </script>
-</body>
-</html>
+    </div>
+</div>
 @endif
+</div>
