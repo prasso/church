@@ -1,4 +1,5 @@
-<style>
+<div style="background:#ffffff;padding:10px;">
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -180,22 +181,14 @@
             }
         }
     </style>
-</head>
-<body>
     <button class="print-button" onclick="window.print()">Print Checklist</button>
     
     <div class="header">
         <div class="header-content">
-            @if($site && $site->logo)
-                <div class="site-logo">
-                    <img src="{{ asset($site->logo) }}" alt="{{ $site->site_name }} Logo" class="logo-img">
-                </div>
-            @endif
+
             <div class="header-text">
-                <h1>Church Cleaning Checklist</h1>
-                @if($site)
-                    <p class="site-name">{{ $site->site_name }}</p>
-                @endif
+                <h1>Cleaning Checklist</h1>
+
             </div>
         </div>
     </div>
@@ -250,3 +243,4 @@
             }
         });
     </script>
+</div>

@@ -183,29 +183,68 @@ class CleaningSignupController extends Controller
             $year = now()->year;
             $startDate = $this->getDateOfWeek($year, $weekNumber);
 
-            // Create a volunteer assignment with week preference in metadata
-            $assignment = DB::transaction(function () use ($position, $validated, $memberId, $signupType, $startDate) {
+            $metadata = [
+                'signup_name' => $validated['name'],
+                'signup_phone' => $validated['phone'] ?? null,
+                'signup_email' => $validated['email'] ?? null,
+                'reminder_type' => $validated['reminder_type'],
+                'preferred_week' => $validated['selected_week'],
+                'data_key' => $validated['data_key'],
+                'signup_date' => now()->toDateTimeString(),
+                'ip_address' => request()->ip(),
+                'signup_type' => $signupType,
+            ];
+
+            $sendReminders = false;
+
+            // Create or update a volunteer assignment with week preference in metadata
+            $assignment = DB::transaction(function () use (
+                $position,
+                $memberId,
+                $signupType,
+                $startDate,
+                $metadata,
+                &$sendReminders
+            ) {
+                $assignment = VolunteerAssignment::withTrashed()
+                    ->where('position_id', $position->id)
+                    ->where('member_id', $memberId)
+                    ->whereDate('start_date', $startDate)
+                    ->first();
+
+                if ($assignment) {
+                    $existingMetadata = $assignment->metadata ?? [];
+                    $sendReminders = ($existingMetadata['reminder_type'] ?? null) !== ($metadata['reminder_type'] ?? null)
+                        || ($existingMetadata['signup_phone'] ?? null) !== ($metadata['signup_phone'] ?? null)
+                        || ($existingMetadata['signup_email'] ?? null) !== ($metadata['signup_email'] ?? null);
+
+                    if (method_exists($assignment, 'trashed') && $assignment->trashed()) {
+                        $assignment->restore();
+                        $assignment->status = 'pending';
+                    }
+
+                    $assignment->notes = "{$signupType} signup via cleaning form";
+                    $assignment->metadata = array_merge($existingMetadata, $metadata);
+                    $assignment->save();
+
+                    return $assignment;
+                }
+
+                $sendReminders = true;
+
                 return VolunteerAssignment::create([
                     'position_id' => $position->id,
                     'member_id' => $memberId,
                     'start_date' => $startDate,
                     'status' => 'pending', // Requires admin approval
                     'notes' => "{$signupType} signup via cleaning form",
-                    'metadata' => [
-                        'signup_name' => $validated['name'],
-                        'signup_phone' => $validated['phone'] ?? null,
-                        'signup_email' => $validated['email'] ?? null,
-                        'reminder_type' => $validated['reminder_type'],
-                        'preferred_week' => $validated['selected_week'],
-                        'data_key' => $validated['data_key'],
-                        'signup_date' => now()->toDateTimeString(),
-                        'ip_address' => request()->ip(),
-                        'signup_type' => $signupType,
-                    ],
+                    'metadata' => $metadata,
                 ]);
             });
 
-            $this->sendReminders($assignment, $member, $validated, $site);
+            if ($sendReminders) {
+                $this->sendReminders($assignment, $member, $validated, $site);
+            }
 
             if ($request->expectsJson() || $request->input('return_json')) {
                 $registrationMode = null;
