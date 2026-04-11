@@ -326,7 +326,7 @@
                         // Calculate date range for this week
                         const weekStart = this.getDateOfWeek(today.getFullYear(), weekNum);
                         const weekEnd = new Date(weekStart);
-                        weekEnd.setDate(weekEnd.getDate() + 6);
+                        weekEnd.setDate(weekEnd.getDate() + 2);
                         
                         const dateRange = this.formatDateRange(weekStart, weekEnd);
                         
@@ -355,7 +355,10 @@
             },
             
             getWeekNumber(date) {
-                const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                const shifted = new Date(date);
+                shifted.setDate(shifted.getDate() - 3);
+
+                const d = new Date(Date.UTC(shifted.getFullYear(), shifted.getMonth(), shifted.getDate()));
                 const dayNum = d.getUTCDay() || 7;
                 d.setUTCDate(d.getUTCDate() + 4 - dayNum);
                 const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -370,7 +373,10 @@
                     ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
                 else
                     ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-                return ISOweekStart;
+
+                const thursdayStart = new Date(ISOweekStart);
+                thursdayStart.setDate(thursdayStart.getDate() + 3);
+                return thursdayStart;
             },
             
             formatDateRange(start, end) {

@@ -315,12 +315,12 @@ class CleaningSignupController extends Controller
                 $startDate = $assignment->start_date;
                 $weekNumber = $assignment->metadata['preferred_week'] ?? null;
                 if (!$weekNumber && $startDate) {
-                    $weekNumber = (int) $startDate->format('W');
+                    $weekNumber = (int) $startDate->copy()->subDays(3)->format('W');
                 }
 
                 $weekRange = null;
                 if ($startDate) {
-                    $weekRange = $startDate->format('M j') . ' - ' . $startDate->copy()->addDays(6)->format('M j, Y');
+                    $weekRange = $startDate->format('M j') . ' - ' . $startDate->copy()->addDays(2)->format('M j, Y');
                 }
 
                 return [
@@ -624,12 +624,13 @@ class CleaningSignupController extends Controller
     }
 
     /**
-     * Get the Monday start date for a given ISO week number.
+     * Get the Thursday start date for a given ISO week number.
      */
     private function getDateOfWeek(int $year, int $week): string
     {
         $date = new \DateTime();
-        $date->setISODate($year, $week, 1); // 1 = Monday
+        $date->setISODate($year, $week, 1); // Monday
+        $date->modify('+3 days');
         return $date->format('Y-m-d');
     }
 }
