@@ -26,8 +26,6 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/cleaning-signup/report', [CleaningSignupController::class, 'report'])
         ->name('church.cleaning.signup.report');
 
-    Route::get('/cleaning-checklist', [CleaningSignupController::class, 'checklist'])
-        ->name('church.cleaning.checklist');
 });
 
 // Cleaning Signup Routes - Available to both authenticated and unauthenticated users
@@ -38,4 +36,7 @@ Route::middleware(['web'])->group(function () {
         ->name('church.cleaning.signup.store');
     Route::get('/cleaning-signup/schedule', [CleaningSignupController::class, 'getSchedule'])
         ->name('church.cleaning.signup.schedule');
+
+    Route::get('/cleaning-checklist', [CleaningSignupController::class, 'checklist'])
+        ->name('church.cleaning.checklist');
 });
