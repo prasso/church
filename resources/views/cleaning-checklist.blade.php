@@ -1,8 +1,8 @@
 <div class="cc-root">
     <style>
         .cc-root {
-            --cc-primary: #2563eb;
-            --cc-primary-dark: #1d4ed8;
+            --cc-primary: {{ $primaryColor ?? '#2563eb' }};
+            --cc-primary-dark: {{ $primaryColorDark ?? '#1d4ed8' }};
             --cc-accent: #10b981;
             --cc-bg: #f8fafc;
             --cc-card: #ffffff;
@@ -254,6 +254,7 @@
                 color: #000 !important;
                 box-shadow: none;
                 border: 2px solid #000;
+                print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
             .cc-actions, .cc-chevron { display: none !important; }

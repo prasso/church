@@ -15,6 +15,28 @@ use Prasso\Messaging\Models\MsgDelivery;
 class CleaningSignupController extends Controller
 {
     /**
+     * Darken a hex color by a percentage.
+     */
+    private function darkenColor($hex, $percent)
+    {
+        // Remove # if present
+        $hex = ltrim($hex, '#');
+        
+        // Parse hex
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+        
+        // Darken
+        $r = max(0, min(255, $r - ($r * $percent / 100)));
+        $g = max(0, min(255, $g - ($g * $percent / 100)));
+        $b = max(0, min(255, $b - ($b * $percent / 100)));
+        
+        // Convert back to hex
+        return sprintf("#%02x%02x%02x", $r, $g, $b);
+    }
+
+    /**
      * Display the cleaning signup form.
      */
     public function show()
@@ -421,6 +443,10 @@ class CleaningSignupController extends Controller
         // Get the masterpage template name from site or use default
         $masterpageTemplate = $this->getMasterpageTemplate($site, $masterPage);
         
+        // Generate color variants from site's main_color
+        $primaryColor = $site->main_color ?? '#2563eb';
+        $primaryColorDark = $this->darkenColor($primaryColor, 20);
+        
         $sitePage = $this->buildSitePage(
             $site,
             $masterpageTemplate,
@@ -430,6 +456,8 @@ class CleaningSignupController extends Controller
                 'regularTasks' => $regularTasks,
                 'extraTasks' => $extraTasks,
                 'site' => $site,
+                'primaryColor' => $primaryColor,
+                'primaryColorDark' => $primaryColorDark,
             ])->render()
         );
 
