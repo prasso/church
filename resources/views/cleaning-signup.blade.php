@@ -15,21 +15,35 @@
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-4">
-                    
-                    <div>
-                        <h1 class="text-4xl font-bold text-gray-900 mb-2">Church Cleaning Signup</h1>
-                        <p class="text-lg text-gray-600">Sign up to help keep our church clean and welcoming</p>
+            <div class="text-center mb-6">
+
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Church Cleaning Signup</h1>
+                <p class="text-lg text-gray-600 mb-4">Help keep our church clean and welcoming for everyone</p>
+                <div class="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Flexible scheduling</span>
                     </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Automatic reminders</span>
+                    </div>
+                    
                 </div>
+            </div>
+            <div class="text-center">
                 <a href="{{ route('church.cleaning.checklist') }}" 
                    target="_blank" 
-                   class="teambutton inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 shadow-md transition-colors">
+                   class="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-lg shadow-md transition-colors hover:opacity-90"
+                   style="background-color: {{ $site->main_color ?? '#3B82F6' }};">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                     </svg>
-                    Cleaning Checklist
+                    View Cleaning Checklist
                 </a>
             </div>
         </div>
@@ -71,8 +85,15 @@
             <!-- Schedule Section -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Weekly Schedule</h2>
-                    <p class="text-gray-600 mb-6">Select an available week to sign up for cleaning:</p>
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background-color: {{ $site->main_color ?? '#3B82F6' }}20;">
+                            <span class="font-semibold text-sm" style="color: {{ $site->main_color ?? '#3B82F6' }};">1</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Choose Your Week</h2>
+                            <p class="text-gray-600 text-sm">Select an available week from the schedule below</p>
+                        </div>
+                    </div>
 
                     <!-- Schedule Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -119,7 +140,15 @@
             <!-- Signup Form Section -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-md p-6 sticky top-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Your Information</h2>
+                    <div class="flex items-center mb-6">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background-color: {{ $site->main_color ?? '#3B82F6' }}20;">
+                            <span class="font-semibold text-sm" style="color: {{ $site->main_color ?? '#3B82F6' }};">2</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Your Information</h2>
+                            <p class="text-gray-600 text-sm">Tell us how to reach you</p>
+                        </div>
+                    </div>
 
                     <form @submit.prevent="submitForm" class="space-y-4">
                         <!-- CSRF Token -->
@@ -240,21 +269,44 @@
                             </p>
                         </div>
 
+                        <!-- Form Progress Indicator -->
+                        <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600">Form Progress:</span>
+                                <span class="font-semibold" :class="isFormValid() ? 'text-green-600' : 'text-orange-600'" x-text="isFormValid() ? 'Complete' : 'Incomplete'"></span>
+                            </div>
+                            <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full transition-all duration-300" :style="`width: ${getFormProgress()}%; background-color: '{{ $site->main_color ?? '#3B82F6' }}'`"></div>
+                            </div>
+                        </div>
+
                         <!-- Submit Button -->
                         <button
                             type="submit"
                             :disabled="!isFormValid()"
                             :class="{
-                                'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer': isFormValid(),
+                                'text-white cursor-pointer shadow-lg transform hover:scale-105': isFormValid(),
                                 'bg-gray-400 text-gray-200 cursor-not-allowed': !isFormValid()
                             }"
-                            class="w-full py-2 px-4 rounded-lg font-semibold transition-colors mt-6"
+                            class="w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 mt-6"
+                            :style="isFormValid() ? { backgroundColor: '{{ $site->main_color ?? '#3B82F6' }}' } : {}"
                         >
                             <template x-if="isSubmitting">
-                                <span>Submitting...</span>
+                                <div class="flex items-center justify-center">
+                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Signing you up...</span>
+                                </div>
                             </template>
                             <template x-if="!isSubmitting">
-                                <span>Sign Up for Cleaning</span>
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span>Complete Sign Up</span>
+                                </div>
                             </template>
                         </button>
                     </form>
@@ -424,6 +476,31 @@
                 }
 
                 return true;
+            },
+
+            getFormProgress() {
+                let progress = 0;
+                const totalFields = 4; // name, reminder type, week, contact method
+                
+                // Name (25%)
+                if (this.form.name.trim() !== '') progress += 25;
+                
+                // Reminder type (25%)
+                if (this.form.reminderType !== '') progress += 25;
+                
+                // Week selection (25%)
+                if (this.selectedWeekIndex !== null) progress += 25;
+                
+                // Contact method (25%)
+                if (this.form.reminderType === 'sms' && this.form.phone.trim() !== '') {
+                    progress += 25;
+                } else if (this.form.reminderType === 'email' && this.form.email.trim() !== '') {
+                    progress += 25;
+                } else if (this.form.reminderType === 'both' && this.form.phone.trim() !== '' && this.form.email.trim() !== '') {
+                    progress += 25;
+                }
+                
+                return progress;
             },
 
             async submitForm() {

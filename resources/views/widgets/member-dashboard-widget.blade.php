@@ -17,7 +17,8 @@
                 </div>
             </div>
             <a href="{{ $memberDashboardUrl }}" 
-               class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+               class="px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors hover:opacity-90"
+               style="background-color: {{ $site->main_color ?? '#3B82F6' }};">
                 View Full Dashboard
             </a>
         </div>
@@ -90,9 +91,16 @@
                                 <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
                                     <div class="flex items-start justify-between mb-2">
                                         <h4 class="font-medium text-gray-900">{{ $position['title'] }}</h4>
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                                            Open
-                                        </span>
+                                        @if($position['title'] === 'Clean the Church')
+                                            <a href="{{ route('church.cleaning.signup.show') }}" 
+                                               class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full hover:bg-blue-200 transition-colors">
+                                                Open
+                                            </a>
+                                        @else
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                                                Open
+                                            </span>
+                                        @endif
                                     </div>
                                     @if ($position['description'])
                                         <p class="text-sm text-gray-600 mb-2">{{ Str::limit($position['description'], 80) }}</p>
@@ -106,10 +114,17 @@
                                                 <span>Spots: {{ $position['current_volunteers'] }}/{{ $position['max_volunteers'] }}</span>
                                             @endif
                                         </div>
-                                        <button type="button" wire:click="signUpForPosition({{ $position['id'] }})"
-                                                class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                                            Sign Up
-                                        </button>
+                                        @if($position['title'] === 'Clean the Church')
+                                            <a href="{{ route('church.cleaning.signup.show') }}" 
+                                               class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                                Sign Up
+                                            </a>
+                                        @else
+                                            <button type="button" wire:click="signUpForPosition({{ $position['id'] }})"
+                                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                                Sign Up
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

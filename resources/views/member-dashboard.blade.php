@@ -6,6 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Member Dashboard</title>
     
+    <!-- App CSS (includes btn-primary class) -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
+    <!-- Theme Styles (sets primary color variables) -->
+    @include('partials.theme-styles')
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     

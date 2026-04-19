@@ -89,7 +89,28 @@ class MemberDashboardWidget extends Component
     public function signUpForPosition($positionId)
     {
         $user = Auth::user();
-        $member = Member::where('user_id', $user->id)->first();
+        
+        // Smart member lookup - first try user_id, then email with NULL user_id
+        $member = Member::when($this->siteId, function ($query) {
+                return $query->where('site_id', $this->siteId);
+            })
+            ->where('user_id', $user->id)
+            ->first();
+            
+        // If not found by user_id, try to find by email and update the user_id
+        if (!$member) {
+            $member = Member::where('email', $user->email)
+                ->whereNull('user_id')
+                ->when($this->siteId, function ($query) {
+                    return $query->where('site_id', $this->siteId);
+                })
+                ->first();
+            
+            // If found by email with no user_id, update it
+            if ($member) {
+                $member->update(['user_id' => $user->id]);
+            }
+        }
 
         if (!$member) {
             Notification::make()
@@ -190,10 +211,14 @@ class MemberDashboardWidget extends Component
             return view('livewire.empty-component');
         }
 
+        // Get the site for styling
+        $site = $this->siteId ? \App\Models\Site::find($this->siteId) : null;
+
         return view('church::widgets.member-dashboard-widget', [
             'member' => $this->member,
             'myAssignments' => $this->myAssignments,
             'availablePositions' => $this->availablePositions,
+            'site' => $site,
         ]);
     }
 }
