@@ -62,6 +62,19 @@ class Member extends ChurchModel
     ];
 
     /**
+     * The attributes that should be validated.
+     *
+     * @var array
+     */
+    public static $rules = [
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'nullable|email|unique:chm_members,email,NULL,id,site_id,{site_id}',
+        'phone' => 'nullable|string|max:255',
+        'site_id' => 'required|exists:sites,id',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array

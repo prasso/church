@@ -30,7 +30,7 @@ return new class extends Migration
             
             // Demographics
             $table->date('birthdate')->nullable();
-            $table->enum('gender', ['male', 'female', 'other', 'prefer_not_to_say'])->nullable();
+            $table->enum('gender', ['male', 'female', 'prefer_not_to_say'])->nullable();
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed', 'separated'])->nullable();
             $table->date('anniversary')->nullable();
             
