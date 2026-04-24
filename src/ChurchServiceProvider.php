@@ -45,8 +45,10 @@ class ChurchServiceProvider extends ServiceProvider
             __DIR__ . '/../config/church.php' => config_path('church.php'),
         ], 'church-config');
         
-        // Load API routes
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        // Load API routes with proper middleware
+        Route::middleware('api')->group(function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        });
 
         // Load Web routes (ensure 'web' middleware is applied)
         Route::middleware('web')->group(function () {

@@ -5,6 +5,7 @@ use Prasso\Church\Http\Controllers\Auth\AuthController;
 use Prasso\Church\Http\Controllers\EventController;
 use Prasso\Church\Http\Controllers\FinancialController;
 use Prasso\Church\Http\Controllers\GroupController;
+use Prasso\Church\Http\Controllers\GuestSignupController;
 use Prasso\Church\Http\Controllers\PledgeController;
 use Prasso\Church\Http\Controllers\PrayerRequestController;
 use Prasso\Church\Http\Controllers\VolunteerController;
@@ -34,6 +35,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 });
+
+// Guest signup (public, no auth required)
+Route::post('/guest-signup', [GuestSignupController::class, 'store']);
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
