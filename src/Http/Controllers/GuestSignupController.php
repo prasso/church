@@ -180,10 +180,15 @@ class GuestSignupController extends Controller
         }
 
         // Try to get from subdomain or host
-        $host = request()->getHost();
-        $site = Site::where('host', $host)->first();
-        if ($site) {
-            return $site;
+        // The host column contains comma-separated values, so we need to search within it
+        $requestHost = request()->getHost();
+        $sites = Site::all();
+        
+        foreach ($sites as $site) {
+            $hosts = array_map('trim', explode(',', $site->host ?? ''));
+            if (in_array($requestHost, $hosts)) {
+                return $site;
+            }
         }
 
         // Fallback: return first site (for development)
