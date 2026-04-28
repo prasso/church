@@ -26,17 +26,10 @@ class GuestSignupController extends Controller
             'email' => 'nullable|email|max:255',
             'heard_from' => 'nullable|string|max:1000',
             'first_time' => 'nullable|boolean',
-            'consent' => 'required|boolean',
+            'consent' => 'nullable|boolean',
         ]);
 
-        // Consent must be explicitly accepted
-        if (!$validated['consent']) {
-            return $this->sendError(
-                'You must agree to receive text messages to continue.',
-                [],
-                422
-            );
-        }
+        // SMS consent is optional - if not given, skip SMS but still process signup
 
         try {
             $site = $this->getSiteFromRequest();
@@ -63,22 +56,28 @@ class GuestSignupController extends Controller
             $member->notes = $notes;
             $member->save();
 
-            // Initiate SMS consent flow via messaging package
-            $consentRequest = new Request([
-                'phone' => $validated['phone'],
-                'name' => $validated['name'],
-                'email' => $validated['email'] ?? '',
-                'checkbox' => true,
-                'consent_checkbox' => true,
-                'source_url' => $request->headers->get('referer'),
-                'ip' => $request->ip(),
-                'ua' => $request->userAgent(),
-                'team_id' => $site->team_id ?? null,
-            ]);
+            // Initiate SMS consent flow only if consent was given
+            $consentStatusCode = null;
+            $smsSent = false;
+            
+            if ($validated['consent'] ?? false) {
+                $consentRequest = new Request([
+                    'phone' => $validated['phone'],
+                    'name' => $validated['name'],
+                    'email' => $validated['email'] ?? '',
+                    'checkbox' => true,
+                    'consent_checkbox' => true,
+                    'source_url' => $request->headers->get('referer'),
+                    'ip' => $request->ip(),
+                    'ua' => $request->userAgent(),
+                    'team_id' => $site->team_id ?? null,
+                ]);
 
-            $consentController = new ConsentController();
-            $consentResponse = $consentController->optInWeb($consentRequest);
-            $consentStatusCode = $consentResponse->getStatusCode();
+                $consentController = new ConsentController();
+                $consentResponse = $consentController->optInWeb($consentRequest);
+                $consentStatusCode = $consentResponse->getStatusCode();
+                $smsSent = true;
+            }
 
             // Log the signup
             Log::info('Guest signup initiated', [
@@ -86,18 +85,35 @@ class GuestSignupController extends Controller
                 'site_id' => $site->id,
                 'phone' => $validated['phone'],
                 'email' => $validated['email'] ?? null,
+                'sms_consent_given' => $validated['consent'] ?? false,
+                'sms_sent' => $smsSent,
                 'consent_status' => $consentStatusCode,
             ]);
 
+            // Prepare success message based on what was sent
+            $message = 'Thank you for signing up!';
+            $details = [
+                'member_id' => $member->id,
+                'phone' => $validated['phone'],
+                'email' => $validated['email'] ?? null,
+            ];
+            
+            if ($smsSent) {
+                $message .= ' Please check your phone for a confirmation text message.';
+                $details['sms_sent'] = true;
+            } elseif ($validated['email'] ?? null) {
+                $message .= ' We\'ll send updates to your email address.';
+                $details['email_updates'] = true;
+            } else {
+                $message .= ' We\'ll keep you updated!';
+            }
+            
+            $details['message'] = $message;
+            
             // Return success response
             return $this->sendResponse(
-                [
-                    'member_id' => $member->id,
-                    'phone' => $validated['phone'],
-                    'email' => $validated['email'] ?? null,
-                    'message' => 'Thank you! Please check your phone for a confirmation text message.',
-                ],
-                'Guest signup recorded. Confirmation SMS sent.',
+                $details,
+                'Thank you for connecting with us! We’re so glad you reached out. Someone from our team will be in touch soon.',
                 201
             );
         } catch (\Exception $e) {

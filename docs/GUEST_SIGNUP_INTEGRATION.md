@@ -85,14 +85,7 @@ JavaScript Handler (guest-signup.js)
 }
 ```
 
-**Response (Error - 422/500)**:
-```json
-{
-  "success": false,
-  "message": "You must agree to receive text messages to continue.",
-  "errors": {}
-}
-```
+
 
 ### 3. Frontend Form
 
