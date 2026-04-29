@@ -73,7 +73,7 @@ class GuestSignupController extends Controller
                     'team_id' => $site->team_id ?? null,
                 ]);
 
-                $consentController = new ConsentController();
+                $consentController = new ConsentController($request);
                 $consentResponse = $consentController->optInWeb($consentRequest);
                 $consentStatusCode = $consentResponse->getStatusCode();
                 $smsSent = true;
