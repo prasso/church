@@ -1,4 +1,5 @@
 @php
+    use Prasso\Church\Models\VolunteerPosition;
     $memberDashboardUrl = route('church.member.dashboard');
 @endphp
 
